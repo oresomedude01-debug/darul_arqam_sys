@@ -19,6 +19,7 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard
 
 // Students Management
 Route::resource('students', StudentController::class);
+Route::put('/students/{id}/update-status', [StudentController::class, 'updateStatus'])->name('students.update-status');
 
 // Teachers Management
 Route::resource('teachers', TeacherController::class);
