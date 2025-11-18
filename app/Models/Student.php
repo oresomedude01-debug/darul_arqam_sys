@@ -11,34 +11,44 @@ class Student extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        // Admission Details
         'admission_number',
         'admission_date',
         'status',
+        'registration_token_id',
+
+        // Personal Information
         'first_name',
         'middle_name',
         'last_name',
         'date_of_birth',
         'gender',
         'nationality',
+        'religion',
+        'place_of_birth',
         'address',
         'photo_path',
+        'blood_group',
+
+        // Academic Information
         'class_level',
         'section',
         'session_year',
         'roll_number',
-        'previous_school_name',
-        'previous_school_address',
-        'previous_class',
-        'transfer_reason',
-        'previous_result_path',
-        'allergies',
-        'medical_conditions',
-        'blood_group',
-        'emergency_contact_name',
-        'emergency_contact_phone',
-        'emergency_medical_consent',
+
+        // Contact Information
         'email',
         'phone',
+
+        // Previous School Information
+        'previous_school_name',
+        'previous_school_address',
+        'previous_school_grade',
+        'previous_school_year',
+        'previous_school_reason',
+        'previous_result_path',
+
+        // Parent/Guardian Information
         'parent1_name',
         'parent1_relationship',
         'parent1_phone',
@@ -49,9 +59,21 @@ class Student extends Model
         'parent2_phone',
         'parent2_email',
         'parent2_occupation',
+        'emergency_contact_name',
+        'emergency_contact_phone',
         'preferred_contact_method',
+
+        // Health & Medical Information
+        'allergies',
+        'medical_conditions',
+        'medications',
+        'emergency_medical_consent',
+        'special_needs',
+
+        // Additional Information
         'notes',
-        'registration_token_id',
+
+        // System Fields
         'created_by',
         'updated_by',
     ];
