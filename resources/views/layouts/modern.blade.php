@@ -404,9 +404,88 @@
         </footer>
     </div>
 
+    <!-- Toast Notification Container -->
+    <div id="toast-container"
+         x-data="toastManager()"
+         @toast.window="addToast($event.detail)"
+         class="fixed top-4 right-4 z-50 flex flex-col gap-3 max-w-sm">
+        <template x-for="toast in toasts" :key="toast.id">
+            <div x-show="toast.visible"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="transform translate-x-full opacity-0"
+                 x-transition:enter-end="transform translate-x-0 opacity-100"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="transform translate-x-0 opacity-100"
+                 x-transition:leave-end="transform translate-x-full opacity-0"
+                 :class="{
+                     'bg-green-50 border-green-200 text-green-900': toast.type === 'success',
+                     'bg-red-50 border-red-200 text-red-900': toast.type === 'error',
+                     'bg-yellow-50 border-yellow-200 text-yellow-900': toast.type === 'warning',
+                     'bg-blue-50 border-blue-200 text-blue-900': toast.type === 'info'
+                 }"
+                 class="flex items-start gap-3 p-4 rounded-lg border shadow-lg">
+                <i :class="{
+                    'fas fa-check-circle text-green-600': toast.type === 'success',
+                    'fas fa-exclamation-circle text-red-600': toast.type === 'error',
+                    'fas fa-exclamation-triangle text-yellow-600': toast.type === 'warning',
+                    'fas fa-info-circle text-blue-600': toast.type === 'info'
+                }" class="text-xl mt-0.5"></i>
+                <div class="flex-1">
+                    <p class="font-semibold text-sm" x-text="toast.title"></p>
+                    <p class="text-xs mt-1" x-text="toast.message" x-show="toast.message"></p>
+                </div>
+                <button @click="removeToast(toast.id)" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </template>
+    </div>
+
     @stack('scripts')
 
     <script>
+        // Toast Notification System
+        function toastManager() {
+            return {
+                toasts: [],
+                nextId: 1,
+
+                addToast(data) {
+                    const toast = {
+                        id: this.nextId++,
+                        type: data.type || 'info',
+                        title: data.title || 'Notification',
+                        message: data.message || '',
+                        visible: true
+                    };
+
+                    this.toasts.push(toast);
+
+                    // Auto-remove after 5 seconds
+                    setTimeout(() => {
+                        this.removeToast(toast.id);
+                    }, data.duration || 5000);
+                },
+
+                removeToast(id) {
+                    const index = this.toasts.findIndex(t => t.id === id);
+                    if (index !== -1) {
+                        this.toasts[index].visible = false;
+                        setTimeout(() => {
+                            this.toasts.splice(index, 1);
+                        }, 200);
+                    }
+                }
+            };
+        }
+
+        // Global toast function
+        window.showToast = function(type, title, message, duration = 5000) {
+            window.dispatchEvent(new CustomEvent('toast', {
+                detail: { type, title, message, duration }
+            }));
+        };
+
         // Auto-hide alerts after 5 seconds
         setTimeout(() => {
             document.querySelectorAll('.alert').forEach(alert => {

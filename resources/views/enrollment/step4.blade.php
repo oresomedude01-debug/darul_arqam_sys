@@ -4,16 +4,12 @@
 
 @section('content')
 <div class="max-w-4xl mx-auto">
-    <!-- Progress Bar -->
-    <div class="mb-8">
-        <div class="flex items-center justify-between mb-2">
-            <span class="text-sm font-semibold text-gray-700">Step 4 of 5</span>
-            <span class="text-sm text-gray-600">80% Complete</span>
-        </div>
-        <div class="w-full bg-gray-200 rounded-full h-3">
-            <div class="bg-primary-600 h-3 rounded-full transition-all duration-300" style="width: 80%"></div>
-        </div>
-    </div>
+    <!-- Progress Stepper -->
+    @include('enrollment._stepper', [
+        'currentStep' => 4,
+        'stepTitle' => 'Parent/Guardian Information',
+        'stepDescription' => 'Contact details for guardians'
+    ])
 
     <!-- Header -->
     <div class="card bg-gradient-to-r from-primary-50 to-blue-50 border-l-4 border-primary-500 mb-6">
@@ -24,7 +20,7 @@
                 </div>
                 <div>
                     <h2 class="text-xl font-bold text-gray-900">Parent/Guardian Information</h2>
-                    <p class="text-gray-700 text-sm">Final step - Please provide contact information</p>
+                    <p class="text-gray-700 text-sm">Please provide contact information for parents/guardians</p>
                 </div>
             </div>
         </div>
@@ -115,8 +111,8 @@
             <a href="{{ route('enrollment.step3') }}" class="btn btn-outline">
                 <i class="fas fa-arrow-left mr-2"></i>Back
             </a>
-            <button type="submit" class="btn btn-primary text-lg">
-                <i class="fas fa-check mr-2"></i>Complete Enrollment
+            <button type="submit" class="btn btn-primary">
+                Next Step <i class="fas fa-arrow-right ml-2"></i>
             </button>
         </div>
     </form>

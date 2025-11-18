@@ -4,16 +4,12 @@
 
 @section('content')
 <div class="max-w-4xl mx-auto">
-    <!-- Progress Bar -->
-    <div class="mb-8">
-        <div class="flex items-center justify-between mb-2">
-            <span class="text-sm font-semibold text-gray-700">Step 3 of 5</span>
-            <span class="text-sm text-gray-600">60% Complete</span>
-        </div>
-        <div class="w-full bg-gray-200 rounded-full h-3">
-            <div class="bg-primary-600 h-3 rounded-full transition-all duration-300" style="width: 60%"></div>
-        </div>
-    </div>
+    <!-- Progress Stepper -->
+    @include('enrollment._stepper', [
+        'currentStep' => 3,
+        'stepTitle' => 'Health & Medical Information',
+        'stepDescription' => 'Medical details and allergies'
+    ])
 
     <!-- Header -->
     <div class="card bg-gradient-to-r from-primary-50 to-blue-50 border-l-4 border-primary-500 mb-6">
