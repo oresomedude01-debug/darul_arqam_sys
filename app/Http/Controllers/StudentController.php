@@ -191,14 +191,61 @@ class StudentController extends Controller
         $student = Student::findOrFail($id);
 
         $validated = $request->validate([
+            // Personal Information
             'first_name' => 'required|string|max:255',
             'middle_name' => 'nullable|string|max:255',
             'last_name' => 'required|string|max:255',
             'date_of_birth' => 'required|date|before:today',
             'gender' => 'required|in:male,female',
-            'status' => 'required|in:pending,active,inactive,graduated,withdrawn,suspended',
-            'class_level' => 'nullable|string',
+            'blood_group' => 'nullable|string|max:10',
+            'nationality' => 'nullable|string|max:255',
+            'religion' => 'nullable|string|max:255',
+            'place_of_birth' => 'nullable|string|max:255',
+            'address' => 'nullable|string',
             'photo' => 'nullable|image|max:2048',
+
+            // Academic Information
+            'class_level' => 'required|string',
+            'section' => 'nullable|string',
+            'session_year' => 'required|string',
+            'roll_number' => 'nullable|string|max:50',
+            'status' => 'required|in:pending,active,inactive,graduated,withdrawn,suspended',
+
+            // Contact Information
+            'email' => 'nullable|email|unique:students,email,' . $id,
+            'phone' => 'nullable|string|max:20',
+
+            // Parent/Guardian Information - Primary
+            'parent1_name' => 'nullable|string|max:255',
+            'parent1_relationship' => 'nullable|string|max:50',
+            'parent1_phone' => 'nullable|string|max:20',
+            'parent1_email' => 'nullable|email|max:255',
+            'parent1_occupation' => 'nullable|string|max:255',
+
+            // Parent/Guardian Information - Secondary
+            'parent2_name' => 'nullable|string|max:255',
+            'parent2_relationship' => 'nullable|string|max:50',
+            'parent2_phone' => 'nullable|string|max:20',
+            'parent2_email' => 'nullable|email|max:255',
+            'parent2_occupation' => 'nullable|string|max:255',
+
+            // Previous School Information
+            'previous_school_name' => 'nullable|string|max:255',
+            'previous_school_address' => 'nullable|string',
+            'previous_school_grade' => 'nullable|string|max:100',
+            'previous_school_year' => 'nullable|integer|min:2000|max:' . date('Y'),
+            'previous_school_reason' => 'nullable|string',
+
+            // Health & Medical Information
+            'allergies' => 'nullable|array',
+            'allergies.*' => 'string|max:255',
+            'medical_conditions' => 'nullable|string',
+            'medications' => 'nullable|string',
+            'emergency_medical_consent' => 'nullable|boolean',
+            'special_needs' => 'nullable|string',
+
+            // Additional Information
+            'notes' => 'nullable|string',
         ]);
 
         // Handle photo upload
@@ -209,6 +256,14 @@ class StudentController extends Controller
             }
             $validated['photo_path'] = $request->file('photo')->store('students/photos', 'public');
         }
+
+        // Convert allergies array to JSON if present
+        if (isset($validated['allergies'])) {
+            $validated['allergies'] = json_encode($validated['allergies']);
+        }
+
+        // Convert emergency_medical_consent to boolean
+        $validated['emergency_medical_consent'] = $request->has('emergency_medical_consent');
 
         $validated['updated_by'] = auth()->id() ?? 1;
 
