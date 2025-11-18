@@ -19,6 +19,9 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
+    <!-- Modern Design System CSS -->
+    <link rel="stylesheet" href="{{ asset('css/modern-design.css') }}">
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -177,6 +180,7 @@
         }
     </style>
 
+    <!-- Tailwind Config -->
     <script>
         tailwind.config = {
             theme: {
@@ -199,6 +203,8 @@
             }
         }
     </script>
+
+    @stack('styles')
 </head>
 
 <body class="bg-gray-50 antialiased" x-data="{ mobileMenuOpen: false, contactModalOpen: false }">
@@ -250,6 +256,7 @@
         <!-- Mobile Menu -->
         <div x-show="mobileMenuOpen"
              @click.away="mobileMenuOpen = false"
+             @close-mobile-menu.window="mobileMenuOpen = false"
              x-transition:enter="transition ease-out duration-200"
              x-transition:enter-start="opacity-0 transform scale-95"
              x-transition:enter-end="opacity-100 transform scale-100"
@@ -259,10 +266,10 @@
              class="md:hidden bg-white border-t"
              x-cloak>
             <div class="px-4 py-4 space-y-3">
-                <a href="#home" class="block text-gray-700 hover:text-purple-600 transition font-medium py-2">Home</a>
-                <a href="#about" class="block text-gray-700 hover:text-purple-600 transition font-medium py-2">About</a>
-                <a href="#features" class="block text-gray-700 hover:text-purple-600 transition font-medium py-2">Features</a>
-                <a href="#contact" class="block text-gray-700 hover:text-purple-600 transition font-medium py-2">Contact</a>
+                <a href="#home" @click="mobileMenuOpen = false" class="block text-gray-700 hover:text-purple-600 transition font-medium py-2">Home</a>
+                <a href="#about" @click="mobileMenuOpen = false" class="block text-gray-700 hover:text-purple-600 transition font-medium py-2">About</a>
+                <a href="#features" @click="mobileMenuOpen = false" class="block text-gray-700 hover:text-purple-600 transition font-medium py-2">Features</a>
+                <a href="#contact" @click="mobileMenuOpen = false" class="block text-gray-700 hover:text-purple-600 transition font-medium py-2">Contact</a>
                 @if (Route::has('login'))
                     @auth
                         <a href="{{ url('/dashboard') }}" class="block px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-500 text-white rounded-lg text-center">
@@ -726,7 +733,9 @@
         </span>
     </a>
 
-    <!-- Contact Form Script -->
+    @stack('scripts')
+
+    <!-- Welcome Page Scripts -->
     <script>
         function contactForm() {
             return {
@@ -807,6 +816,14 @@
                         behavior: 'smooth'
                     });
                 }
+            });
+        });
+
+        // Close mobile menu when clicking on anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(link => {
+            link.addEventListener('click', () => {
+                // Trigger Alpine to close mobile menu
+                window.dispatchEvent(new CustomEvent('close-mobile-menu'));
             });
         });
     </script>
