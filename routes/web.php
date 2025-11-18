@@ -29,6 +29,11 @@ Route::middleware(['auth'])->group(function () {
     // Students Management
     Route::resource('students', StudentController::class);
     Route::put('/students/{id}/update-status', [StudentController::class, 'updateStatus'])->name('students.update-status');
+    Route::get('/students/{id}/print', [StudentController::class, 'print'])->name('students.print');
+    Route::get('/students-export', [StudentController::class, 'export'])->name('students.export');
+    Route::get('/students-import', [StudentController::class, 'importForm'])->name('students.import-form');
+    Route::post('/students-import', [StudentController::class, 'import'])->name('students.import');
+    Route::get('/students-template', [StudentController::class, 'downloadTemplate'])->name('students.template');
 
     // Teachers Management
     Route::resource('teachers', TeacherController::class);

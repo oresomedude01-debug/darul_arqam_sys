@@ -175,6 +175,15 @@ class StudentController extends Controller
     }
 
     /**
+     * Display printable student profile
+     */
+    public function print(string $id)
+    {
+        $student = Student::with('registrationToken')->findOrFail($id);
+        return view('students.print', compact('student'));
+    }
+
+    /**
      * Show the form for editing the specified resource.
      */
     public function edit(string $id)
@@ -303,5 +312,288 @@ class StudentController extends Controller
         return redirect()
             ->route('students.show', $student->id)
             ->with('success', 'Student status updated successfully!');
+    }
+
+    /**
+     * Export students to CSV
+     */
+    public function export(Request $request)
+    {
+        $query = Student::query();
+
+        // Apply filters if provided
+        if ($request->filled('class')) {
+            $query->where('class_level', $request->class);
+        }
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        if ($request->filled('session')) {
+            $query->where('session_year', $request->session);
+        }
+
+        $students = $query->get();
+
+        $filename = 'students_export_' . date('Y-m-d_His') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+
+        $callback = function() use ($students) {
+            $file = fopen('php://output', 'w');
+
+            // Add CSV headers
+            fputcsv($file, [
+                'Admission Number',
+                'First Name',
+                'Middle Name',
+                'Last Name',
+                'Date of Birth',
+                'Gender',
+                'Blood Group',
+                'Nationality',
+                'Religion',
+                'Place of Birth',
+                'Address',
+                'Email',
+                'Phone',
+                'Class Level',
+                'Section',
+                'Session Year',
+                'Roll Number',
+                'Status',
+                'Parent 1 Name',
+                'Parent 1 Relationship',
+                'Parent 1 Phone',
+                'Parent 1 Email',
+                'Parent 2 Name',
+                'Parent 2 Relationship',
+                'Parent 2 Phone',
+                'Parent 2 Email',
+                'Previous School',
+                'Admission Date',
+            ]);
+
+            // Add student data
+            foreach ($students as $student) {
+                fputcsv($file, [
+                    $student->admission_number,
+                    $student->first_name,
+                    $student->middle_name,
+                    $student->last_name,
+                    $student->date_of_birth ? $student->date_of_birth->format('Y-m-d') : '',
+                    $student->gender,
+                    $student->blood_group,
+                    $student->nationality,
+                    $student->religion,
+                    $student->place_of_birth,
+                    $student->address,
+                    $student->email,
+                    $student->phone,
+                    $student->class_level,
+                    $student->section,
+                    $student->session_year,
+                    $student->roll_number,
+                    $student->status,
+                    $student->parent1_name,
+                    $student->parent1_relationship,
+                    $student->parent1_phone,
+                    $student->parent1_email,
+                    $student->parent2_name,
+                    $student->parent2_relationship,
+                    $student->parent2_phone,
+                    $student->parent2_email,
+                    $student->previous_school_name,
+                    $student->admission_date ? $student->admission_date->format('Y-m-d') : '',
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Show import form
+     */
+    public function importForm()
+    {
+        return view('students.import');
+    }
+
+    /**
+     * Import students from CSV
+     */
+    public function import(Request $request)
+    {
+        $request->validate([
+            'csv_file' => 'required|file|mimes:csv,txt|max:10240', // 10MB max
+        ]);
+
+        $file = $request->file('csv_file');
+        $path = $file->getRealPath();
+
+        $csv = array_map('str_getcsv', file($path));
+        $header = array_shift($csv); // Remove header row
+
+        $imported = 0;
+        $skipped = 0;
+        $errors = [];
+
+        foreach ($csv as $index => $row) {
+            try {
+                // Skip empty rows
+                if (empty(array_filter($row))) {
+                    continue;
+                }
+
+                // Map CSV columns to database fields
+                $data = [
+                    'first_name' => $row[1] ?? null,
+                    'middle_name' => $row[2] ?? null,
+                    'last_name' => $row[3] ?? null,
+                    'date_of_birth' => $row[4] ?? null,
+                    'gender' => $row[5] ?? null,
+                    'blood_group' => $row[6] ?? null,
+                    'nationality' => $row[7] ?? 'Nigerian',
+                    'religion' => $row[8] ?? null,
+                    'place_of_birth' => $row[9] ?? null,
+                    'address' => $row[10] ?? null,
+                    'email' => $row[11] ?? null,
+                    'phone' => $row[12] ?? null,
+                    'class_level' => $row[13] ?? null,
+                    'section' => $row[14] ?? null,
+                    'session_year' => $row[15] ?? '2024/2025',
+                    'roll_number' => $row[16] ?? null,
+                    'status' => $row[17] ?? 'pending',
+                    'parent1_name' => $row[18] ?? null,
+                    'parent1_relationship' => $row[19] ?? null,
+                    'parent1_phone' => $row[20] ?? null,
+                    'parent1_email' => $row[21] ?? null,
+                    'parent2_name' => $row[22] ?? null,
+                    'parent2_relationship' => $row[23] ?? null,
+                    'parent2_phone' => $row[24] ?? null,
+                    'parent2_email' => $row[25] ?? null,
+                    'previous_school_name' => $row[26] ?? null,
+                ];
+
+                // Validate required fields
+                if (empty($data['first_name']) || empty($data['last_name']) || empty($data['class_level'])) {
+                    $skipped++;
+                    $errors[] = "Row " . ($index + 2) . ": Missing required fields (First Name, Last Name, or Class Level)";
+                    continue;
+                }
+
+                // Generate admission number
+                $data['admission_number'] = Student::generateAdmissionNumber();
+                $data['admission_date'] = now();
+                $data['created_by'] = auth()->id() ?? 1;
+
+                Student::create($data);
+                $imported++;
+
+            } catch (\Exception $e) {
+                $skipped++;
+                $errors[] = "Row " . ($index + 2) . ": " . $e->getMessage();
+            }
+        }
+
+        $message = "Import completed: {$imported} students imported successfully";
+        if ($skipped > 0) {
+            $message .= ", {$skipped} rows skipped";
+        }
+
+        return redirect()
+            ->route('students.index')
+            ->with('success', $message)
+            ->with('import_errors', $errors);
+    }
+
+    /**
+     * Download CSV template
+     */
+    public function downloadTemplate()
+    {
+        $filename = 'students_import_template.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+
+        $callback = function() {
+            $file = fopen('php://output', 'w');
+
+            // Add CSV headers
+            fputcsv($file, [
+                'Admission Number (Auto-generated)',
+                'First Name *',
+                'Middle Name',
+                'Last Name *',
+                'Date of Birth (YYYY-MM-DD)',
+                'Gender (male/female)',
+                'Blood Group',
+                'Nationality',
+                'Religion',
+                'Place of Birth',
+                'Address',
+                'Email',
+                'Phone',
+                'Class Level *',
+                'Section',
+                'Session Year',
+                'Roll Number',
+                'Status (active/pending/inactive)',
+                'Parent 1 Name',
+                'Parent 1 Relationship',
+                'Parent 1 Phone',
+                'Parent 1 Email',
+                'Parent 2 Name',
+                'Parent 2 Relationship',
+                'Parent 2 Phone',
+                'Parent 2 Email',
+                'Previous School',
+                'Admission Date (Auto-generated)',
+            ]);
+
+            // Add sample data row
+            fputcsv($file, [
+                'Leave empty',
+                'Ahmed',
+                'Hassan',
+                'Ibrahim',
+                '2010-01-15',
+                'male',
+                'O+',
+                'Nigerian',
+                'Islam',
+                'Lagos',
+                '123 Main Street, Lagos',
+                'parent@example.com',
+                '+234 XXX XXX XXXX',
+                'Primary 5',
+                'A',
+                '2024/2025',
+                '001',
+                'active',
+                'Mr. Ibrahim Hassan',
+                'Father',
+                '+234 XXX XXX XXXX',
+                'father@example.com',
+                'Mrs. Fatima Hassan',
+                'Mother',
+                '+234 XXX XXX XXXX',
+                'mother@example.com',
+                'ABC Primary School',
+                'Leave empty',
+            ]);
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }

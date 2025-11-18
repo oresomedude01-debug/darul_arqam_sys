@@ -27,6 +27,10 @@
             <p class="text-gray-600 mt-1">Complete information about {{$student->full_name }}</p>
         </div>
         <div class="flex space-x-3">
+            <a href="{{ route('students.print', $student->id) }}" target="_blank" class="btn btn-outline">
+                <i class="fas fa-print mr-2"></i>
+                Print
+            </a>
             <a href="{{ route('students.edit', $student->id) }}" class="btn btn-primary">
                 <i class="fas fa-edit mr-2"></i>
                 Edit Profile

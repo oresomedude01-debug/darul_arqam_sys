@@ -25,14 +25,14 @@
             <p class="text-gray-600 mt-1">Manage all registered students in your school</p>
         </div>
         <div class="flex items-center space-x-3">
-            <button class="btn btn-outline">
+            <a href="{{ route('students.export') }}" class="btn btn-outline">
                 <i class="fas fa-download mr-2"></i>
                 Export
-            </button>
-            <button class="btn btn-outline">
+            </a>
+            <a href="{{ route('students.import-form') }}" class="btn btn-outline">
                 <i class="fas fa-upload mr-2"></i>
                 Import
-            </button>
+            </a>
             <a href="{{ route('students.create') }}" class="btn btn-primary">
                 <i class="fas fa-plus mr-2"></i>
                 Add Student
