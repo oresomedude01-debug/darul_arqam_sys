@@ -231,11 +231,11 @@
                     <button @click="open = !open"
                             class="flex items-center space-x-3 w-full p-2 rounded-lg hover:bg-primary-700 transition">
                         <div class="w-10 h-10 rounded-full bg-primary-600 flex items-center justify-center">
-                            <i class="fas fa-user"></i>
+                            <span class="text-sm font-bold">{{ substr(Auth::user()->name, 0, 2) }}</span>
                         </div>
                         <div class="flex-1 text-left">
-                            <p class="text-sm font-medium">Admin User</p>
-                            <p class="text-xs text-primary-300">Administrator</p>
+                            <p class="text-sm font-medium">{{ Auth::user()->name }}</p>
+                            <p class="text-xs text-primary-300">{{ Auth::user()->email }}</p>
                         </div>
                         <i class="fas fa-chevron-up text-xs"></i>
                     </button>
@@ -245,6 +245,10 @@
                          x-transition
                          class="absolute bottom-full left-0 right-0 mb-2 bg-white rounded-lg shadow-lg py-2"
                          style="display: none;">
+                        <div class="px-4 py-2 border-b border-gray-100">
+                            <p class="text-sm font-semibold text-gray-900">{{ Auth::user()->name }}</p>
+                            <p class="text-xs text-gray-500">{{ Auth::user()->email }}</p>
+                        </div>
                         <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                             <i class="fas fa-user-circle mr-2"></i> Profile
                         </a>
@@ -252,9 +256,12 @@
                             <i class="fas fa-cog mr-2"></i> Settings
                         </a>
                         <hr class="my-2">
-                        <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">
-                            <i class="fas fa-sign-out-alt mr-2"></i> Logout
-                        </a>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                                <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>

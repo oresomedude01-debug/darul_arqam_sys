@@ -14,32 +14,38 @@ use App\Http\Controllers\LandingController;
 // Landing Page (Public)
 Route::get('/', [LandingController::class, 'index'])->name('landing');
 
-// Dashboard
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+// Authentication Routes
+require __DIR__.'/auth.php';
 
-// Students Management
-Route::resource('students', StudentController::class);
-Route::put('/students/{id}/update-status', [StudentController::class, 'updateStatus'])->name('students.update-status');
+// Protected Admin Routes
+Route::middleware(['auth'])->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-// Teachers Management
-Route::resource('teachers', TeacherController::class);
+    // Students Management
+    Route::resource('students', StudentController::class);
+    Route::put('/students/{id}/update-status', [StudentController::class, 'updateStatus'])->name('students.update-status');
 
-// Classes Management
-Route::resource('classes', ClassController::class);
+    // Teachers Management
+    Route::resource('teachers', TeacherController::class);
 
-// Attendance Management
-Route::resource('attendance', AttendanceController::class);
-Route::post('/attendance/mark', [AttendanceController::class, 'mark'])->name('attendance.mark');
+    // Classes Management
+    Route::resource('classes', ClassController::class);
 
-// Grades Management
-Route::resource('grades', GradeController::class);
-Route::post('/grades/bulk-upload', [GradeController::class, 'bulkUpload'])->name('grades.bulk-upload');
+    // Attendance Management
+    Route::resource('attendance', AttendanceController::class);
+    Route::post('/attendance/mark', [AttendanceController::class, 'mark'])->name('attendance.mark');
 
-// Registration Tokens Management
-Route::resource('tokens', TokenController::class);
-Route::post('/tokens/bulk-disable', [TokenController::class, 'bulkDisable'])->name('tokens.bulk-disable');
-Route::post('/tokens/bulk-enable', [TokenController::class, 'bulkEnable'])->name('tokens.bulk-enable');
-Route::post('/tokens/validate', [TokenController::class, 'validate'])->name('tokens.validate');
+    // Grades Management
+    Route::resource('grades', GradeController::class);
+    Route::post('/grades/bulk-upload', [GradeController::class, 'bulkUpload'])->name('grades.bulk-upload');
+
+    // Registration Tokens Management
+    Route::resource('tokens', TokenController::class);
+    Route::post('/tokens/bulk-disable', [TokenController::class, 'bulkDisable'])->name('tokens.bulk-disable');
+    Route::post('/tokens/bulk-enable', [TokenController::class, 'bulkEnable'])->name('tokens.bulk-enable');
+    Route::post('/tokens/validate', [TokenController::class, 'validate'])->name('tokens.validate');
+});
 
 // Public Enrollment (No authentication required)
 Route::prefix('enroll')->name('enrollment.')->group(function () {
