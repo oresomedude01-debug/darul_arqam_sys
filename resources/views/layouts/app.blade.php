@@ -116,9 +116,28 @@
                     <div x-show="open"
                          x-collapse
                          class="ml-8 mt-2 space-y-1">
-                        <a href="{{ route('students.index') }}" class="nav-sub-item">All Students</a>
+                                <a href="{{ route('students.index') }}" class="nav-sub-item">All Students</a>
                         <a href="{{ route('students.create') }}" class="nav-sub-item">Add New</a>
                         <a href="#" class="nav-sub-item">Import Students</a>
+                    </div>
+                </div>
+
+                <!-- Registration Tokens -->
+                <div x-data="{ open: {{ request()->is('tokens*') ? 'true' : 'false' }} }">
+                    <button @click="open = !open"
+                            class="nav-item w-full justify-between">
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-ticket-alt w-5"></i>
+                            <span>Registration Tokens</span>
+                        </div>
+                        <i class="fas fa-chevron-down text-xs transform transition-transform"
+                           :class="open ? 'rotate-180' : ''"></i>
+                    </button>
+                    <div x-show="open"
+                         x-collapse
+                         class="ml-8 mt-2 space-y-1">
+                        <a href="{{ route('tokens.index') }}" class="nav-sub-item">All Tokens</a>
+                        <a href="{{ route('tokens.create') }}" class="nav-sub-item">Generate Tokens</a>
                     </div>
                 </div>
 
