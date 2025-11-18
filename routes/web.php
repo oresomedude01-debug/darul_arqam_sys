@@ -9,11 +9,10 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\GradeController;
 use App\Http\Controllers\TokenController;
 use App\Http\Controllers\EnrollmentController;
+use App\Http\Controllers\LandingController;
 
-// Redirect root to dashboard
-Route::get('/', function () {
-    return redirect()->route('dashboard');
-});
+// Landing Page (Public)
+Route::get('/', [LandingController::class, 'index'])->name('landing');
 
 // Dashboard
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
