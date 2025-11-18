@@ -37,6 +37,9 @@ Route::middleware(['auth'])->group(function () {
 
     // Teachers Management
     Route::resource('teachers', TeacherController::class);
+    Route::get('/teachers-export', [TeacherController::class, 'exportCsv'])->name('teachers.export');
+    Route::get('/teachers/{teacher}/assign', [TeacherController::class, 'assign'])->name('teachers.assign');
+    Route::post('/teachers/{teacher}/assign', [TeacherController::class, 'updateAssignments'])->name('teachers.update-assignments');
 
     // Classes Management
     Route::resource('classes', ClassController::class);

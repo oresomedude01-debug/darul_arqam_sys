@@ -1,30 +1,36 @@
 @extends('layouts.modern')
 
-@section('title', 'Add Teacher')
+@section('title', 'Edit Teacher')
 
 @section('breadcrumb')
     <span class="text-gray-400">Teachers</span>
     <span class="text-gray-400">/</span>
     <a href="{{ route('teachers.index') }}" class="text-primary-600 hover:text-primary-700">All Teachers</a>
     <span class="text-gray-400">/</span>
-    <span class="font-semibold text-gray-900">Add New</span>
+    <span class="font-semibold text-gray-900">Edit {{ $teacher->full_name }}</span>
 @endsection
 
 @section('content')
-<div x-data="teacherForm()" class="max-w-5xl mx-auto space-y-6">
+<div x-data="teacherForm('{{ $teacher->profile_picture ? asset('storage/' . $teacher->profile_picture) : '' }}')" class="max-w-5xl mx-auto space-y-6">
     <!-- Page Header -->
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h1 class="text-3xl font-bold text-gray-900">Add New Teacher</h1>
-            <p class="text-sm text-gray-600 mt-1">Fill in the teacher's information</p>
+            <h1 class="text-3xl font-bold text-gray-900">Edit Teacher</h1>
+            <p class="text-sm text-gray-600 mt-1">Update {{ $teacher->full_name }}'s information</p>
         </div>
-        <a href="{{ route('teachers.index') }}" class="btn btn-outline">
-            <i class="fas fa-arrow-left mr-2"></i>Back to List
-        </a>
+        <div class="flex items-center gap-3">
+            <a href="{{ route('teachers.show', $teacher) }}" class="btn btn-outline">
+                <i class="fas fa-eye mr-2"></i>View Profile
+            </a>
+            <a href="{{ route('teachers.index') }}" class="btn btn-outline">
+                <i class="fas fa-arrow-left mr-2"></i>Back to List
+            </a>
+        </div>
     </div>
 
-    <form action="{{ route('teachers.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+    <form action="{{ route('teachers.update', $teacher) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
         @csrf
+        @method('PUT')
 
         <!-- Basic Information -->
         <div class="card">
@@ -40,7 +46,7 @@
                         <input
                             type="text"
                             name="employee_id"
-                            value="{{ old('employee_id') }}"
+                            value="{{ old('employee_id', $teacher->employee_id) }}"
                             class="form-input @error('employee_id') border-red-500 @enderror"
                             required
                         >
@@ -52,9 +58,9 @@
                     <div class="form-group">
                         <label class="form-label">Status <span class="text-red-500">*</span></label>
                         <select name="status" class="form-select @error('status') border-red-500 @enderror" required>
-                            <option value="active" {{ old('status', 'active') === 'active' ? 'selected' : '' }}>Active</option>
-                            <option value="inactive" {{ old('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
-                            <option value="on_leave" {{ old('status') === 'on_leave' ? 'selected' : '' }}>On Leave</option>
+                            <option value="active" {{ old('status', $teacher->status) === 'active' ? 'selected' : '' }}>Active</option>
+                            <option value="inactive" {{ old('status', $teacher->status) === 'inactive' ? 'selected' : '' }}>Inactive</option>
+                            <option value="on_leave" {{ old('status', $teacher->status) === 'on_leave' ? 'selected' : '' }}>On Leave</option>
                         </select>
                         @error('status')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -66,7 +72,7 @@
                         <input
                             type="text"
                             name="first_name"
-                            value="{{ old('first_name') }}"
+                            value="{{ old('first_name', $teacher->first_name) }}"
                             class="form-input @error('first_name') border-red-500 @enderror"
                             required
                         >
@@ -80,7 +86,7 @@
                         <input
                             type="text"
                             name="last_name"
-                            value="{{ old('last_name') }}"
+                            value="{{ old('last_name', $teacher->last_name) }}"
                             class="form-input @error('last_name') border-red-500 @enderror"
                             required
                         >
@@ -93,8 +99,8 @@
                         <label class="form-label">Gender <span class="text-red-500">*</span></label>
                         <select name="gender" class="form-select @error('gender') border-red-500 @enderror" required>
                             <option value="">Select Gender</option>
-                            <option value="male" {{ old('gender') === 'male' ? 'selected' : '' }}>Male</option>
-                            <option value="female" {{ old('gender') === 'female' ? 'selected' : '' }}>Female</option>
+                            <option value="male" {{ old('gender', $teacher->gender) === 'male' ? 'selected' : '' }}>Male</option>
+                            <option value="female" {{ old('gender', $teacher->gender) === 'female' ? 'selected' : '' }}>Female</option>
                         </select>
                         @error('gender')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -106,7 +112,7 @@
                         <input
                             type="date"
                             name="date_of_birth"
-                            value="{{ old('date_of_birth') }}"
+                            value="{{ old('date_of_birth', $teacher->date_of_birth?->format('Y-m-d')) }}"
                             class="form-input @error('date_of_birth') border-red-500 @enderror"
                             max="{{ date('Y-m-d') }}"
                         >
@@ -120,7 +126,7 @@
                         <input
                             type="date"
                             name="date_joined"
-                            value="{{ old('date_joined') }}"
+                            value="{{ old('date_joined', $teacher->date_joined?->format('Y-m-d')) }}"
                             class="form-input @error('date_joined') border-red-500 @enderror"
                         >
                         @error('date_joined')
@@ -133,7 +139,7 @@
                         <input
                             type="text"
                             name="qualification"
-                            value="{{ old('qualification') }}"
+                            value="{{ old('qualification', $teacher->qualification) }}"
                             placeholder="e.g., B.Ed, M.Ed, NCE"
                             class="form-input @error('qualification') border-red-500 @enderror"
                         >
@@ -147,7 +153,7 @@
                 <div class="form-group">
                     <label class="form-label">Profile Picture</label>
                     <div class="flex items-center space-x-4">
-                        <div x-show="imagePreview" class="flex-shrink-0">
+                        <div class="flex-shrink-0">
                             <img :src="imagePreview" alt="Preview" class="w-24 h-24 rounded-full object-cover">
                         </div>
                         <div class="flex-1">
@@ -158,7 +164,7 @@
                                 @change="previewImage($event)"
                                 class="form-input @error('profile_picture') border-red-500 @enderror"
                             >
-                            <p class="text-xs text-gray-500 mt-1">Max 2MB. Accepted formats: JPG, PNG</p>
+                            <p class="text-xs text-gray-500 mt-1">Max 2MB. Accepted formats: JPG, PNG. Leave empty to keep current picture.</p>
                             @error('profile_picture')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
@@ -182,7 +188,7 @@
                         <input
                             type="email"
                             name="email"
-                            value="{{ old('email') }}"
+                            value="{{ old('email', $teacher->email) }}"
                             class="form-input @error('email') border-red-500 @enderror"
                             required
                         >
@@ -196,7 +202,7 @@
                         <input
                             type="tel"
                             name="phone"
-                            value="{{ old('phone') }}"
+                            value="{{ old('phone', $teacher->phone) }}"
                             class="form-input @error('phone') border-red-500 @enderror"
                             required
                         >
@@ -212,7 +218,7 @@
                         name="address"
                         rows="2"
                         class="form-textarea @error('address') border-red-500 @enderror"
-                    >{{ old('address') }}</textarea>
+                    >{{ old('address', $teacher->address) }}</textarea>
                     @error('address')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                     @enderror
@@ -224,7 +230,7 @@
                         <input
                             type="text"
                             name="city"
-                            value="{{ old('city') }}"
+                            value="{{ old('city', $teacher->city) }}"
                             class="form-input @error('city') border-red-500 @enderror"
                         >
                         @error('city')
@@ -237,7 +243,7 @@
                         <input
                             type="text"
                             name="state"
-                            value="{{ old('state') }}"
+                            value="{{ old('state', $teacher->state) }}"
                             class="form-input @error('state') border-red-500 @enderror"
                         >
                         @error('state')
@@ -250,7 +256,7 @@
                         <input
                             type="text"
                             name="country"
-                            value="{{ old('country', 'Nigeria') }}"
+                            value="{{ old('country', $teacher->country) }}"
                             class="form-input @error('country') border-red-500 @enderror"
                         >
                         @error('country')
@@ -274,9 +280,13 @@
                     <div x-data="{ showInput: false, newSubject: '' }">
                         <div class="space-y-2">
                             <div class="flex flex-wrap gap-2" id="subjectsContainer">
-                                @foreach(['Mathematics', 'English Language', 'Arabic', 'Islamic Studies', 'Qur\'an', 'Hadith', 'Basic Science', 'Social Studies', 'Computer Science', 'Physical Education'] as $subject)
+                                @php
+                                    $teacherSubjects = old('subjects', $teacher->subjects ?? []);
+                                    $allSubjects = array_unique(array_merge(['Mathematics', 'English Language', 'Arabic', 'Islamic Studies', 'Qur\'an', 'Hadith', 'Basic Science', 'Social Studies', 'Computer Science', 'Physical Education'], $teacherSubjects));
+                                @endphp
+                                @foreach($allSubjects as $subject)
                                     <label class="inline-flex items-center px-3 py-2 bg-gray-100 hover:bg-primary-50 rounded-lg cursor-pointer transition-colors">
-                                        <input type="checkbox" name="subjects[]" value="{{ $subject }}" class="form-checkbox text-primary-600 mr-2" {{ in_array($subject, old('subjects', [])) ? 'checked' : '' }}>
+                                        <input type="checkbox" name="subjects[]" value="{{ $subject }}" class="form-checkbox text-primary-600 mr-2" {{ in_array($subject, $teacherSubjects) ? 'checked' : '' }}>
                                         <span class="text-sm">{{ $subject }}</span>
                                     </label>
                                 @endforeach
@@ -324,9 +334,13 @@
                     <div x-data="{ showInput: false, newClass: '' }">
                         <div class="space-y-2">
                             <div class="flex flex-wrap gap-2" id="classesContainer">
-                                @foreach(['Nursery 1', 'Nursery 2', 'Primary 1', 'Primary 2', 'Primary 3', 'Primary 4', 'Primary 5', 'Primary 6', 'JSS 1', 'JSS 2', 'JSS 3', 'SSS 1', 'SSS 2', 'SSS 3'] as $class)
+                                @php
+                                    $teacherClasses = old('classes', $teacher->classes ?? []);
+                                    $allClasses = array_unique(array_merge(['Nursery 1', 'Nursery 2', 'Primary 1', 'Primary 2', 'Primary 3', 'Primary 4', 'Primary 5', 'Primary 6', 'JSS 1', 'JSS 2', 'JSS 3', 'SSS 1', 'SSS 2', 'SSS 3'], $teacherClasses));
+                                @endphp
+                                @foreach($allClasses as $class)
                                     <label class="inline-flex items-center px-3 py-2 bg-gray-100 hover:bg-primary-50 rounded-lg cursor-pointer transition-colors">
-                                        <input type="checkbox" name="classes[]" value="{{ $class }}" class="form-checkbox text-primary-600 mr-2" {{ in_array($class, old('classes', [])) ? 'checked' : '' }}>
+                                        <input type="checkbox" name="classes[]" value="{{ $class }}" class="form-checkbox text-primary-600 mr-2" {{ in_array($class, $teacherClasses) ? 'checked' : '' }}>
                                         <span class="text-sm">{{ $class }}</span>
                                     </label>
                                 @endforeach
@@ -384,7 +398,7 @@
                     <input
                         type="number"
                         name="salary"
-                        value="{{ old('salary') }}"
+                        value="{{ old('salary', $teacher->salary) }}"
                         step="0.01"
                         min="0"
                         class="form-input @error('salary') border-red-500 @enderror"
@@ -401,7 +415,7 @@
                         rows="3"
                         class="form-textarea @error('notes') border-red-500 @enderror"
                         placeholder="Any additional notes about the teacher..."
-                    >{{ old('notes') }}</textarea>
+                    >{{ old('notes', $teacher->notes) }}</textarea>
                     @error('notes')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                     @enderror
@@ -411,20 +425,20 @@
 
         <!-- Action Buttons -->
         <div class="flex items-center justify-between">
-            <a href="{{ route('teachers.index') }}" class="btn btn-outline">
+            <a href="{{ route('teachers.show', $teacher) }}" class="btn btn-outline">
                 <i class="fas fa-times mr-2"></i>Cancel
             </a>
             <button type="submit" class="btn btn-primary">
-                <i class="fas fa-save mr-2"></i>Save Teacher
+                <i class="fas fa-save mr-2"></i>Update Teacher
             </button>
         </div>
     </form>
 </div>
 
 <script>
-    function teacherForm() {
+    function teacherForm(existingImage) {
         return {
-            imagePreview: null,
+            imagePreview: existingImage || null,
 
             previewImage(event) {
                 const file = event.target.files[0];
