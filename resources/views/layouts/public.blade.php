@@ -11,6 +11,9 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
+    <!-- Modern Design System -->
+    <link rel="stylesheet" href="{{ asset('css/modern-design.css') }}">
+
     <!-- Alpine.js via CDN for React-like interactivity -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
@@ -44,6 +47,8 @@
     <style>
         [x-cloak] { display: none !important; }
     </style>
+
+    @stack('styles')
 </head>
 <body class="bg-gray-50">
     <!-- Header -->
