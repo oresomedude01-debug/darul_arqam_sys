@@ -10,9 +10,13 @@ use App\Http\Controllers\GradeController;
 use App\Http\Controllers\TokenController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\LocaleController;
 
 // Landing Page (Public)
 Route::get('/', [LandingController::class, 'index'])->name('landing');
+
+// Language Switcher
+Route::get('/locale/{locale}', [LocaleController::class, 'switch'])->name('locale.switch');
 
 // Authentication Routes
 require __DIR__.'/auth.php';

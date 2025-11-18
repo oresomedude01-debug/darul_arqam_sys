@@ -296,6 +296,39 @@
                             <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                         </div>
 
+                        <!-- Language Switcher -->
+                        <div x-data="{ open: false }" class="relative">
+                            <button @click="open = !open"
+                                    class="flex items-center space-x-2 p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg">
+                                <i class="fas fa-language text-xl"></i>
+                                <span class="hidden md:inline text-sm font-medium">{{ app()->getLocale() === 'ar' ? 'العربية' : 'English' }}</span>
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </button>
+
+                            <div x-show="open"
+                                 @click.away="open = false"
+                                 x-transition
+                                 class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-2"
+                                 style="display: none;">
+                                <a href="{{ route('locale.switch', 'en') }}"
+                                   class="flex items-center px-4 py-2 hover:bg-gray-50 {{ app()->getLocale() === 'en' ? 'bg-primary-50 text-primary-700' : 'text-gray-700' }}">
+                                    <span class="mr-2">🇬🇧</span>
+                                    <span class="font-medium">English</span>
+                                    @if(app()->getLocale() === 'en')
+                                        <i class="fas fa-check ml-auto text-primary-600"></i>
+                                    @endif
+                                </a>
+                                <a href="{{ route('locale.switch', 'ar') }}"
+                                   class="flex items-center px-4 py-2 hover:bg-gray-50 {{ app()->getLocale() === 'ar' ? 'bg-primary-50 text-primary-700' : 'text-gray-700' }}">
+                                    <span class="mr-2">🇸🇦</span>
+                                    <span class="font-medium">العربية</span>
+                                    @if(app()->getLocale() === 'ar')
+                                        <i class="fas fa-check ml-auto text-primary-600"></i>
+                                    @endif
+                                </a>
+                            </div>
+                        </div>
+
                         <!-- Notifications -->
                         <div x-data="{ open: false }" class="relative">
                             <button @click="open = !open"
