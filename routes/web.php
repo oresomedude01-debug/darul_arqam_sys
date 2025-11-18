@@ -43,6 +43,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Classes Management
     Route::resource('classes', ClassController::class);
+    Route::get('/classes-export', [ClassController::class, 'exportCsv'])->name('classes.export');
 
     // Attendance Management
     Route::resource('attendance', AttendanceController::class);
