@@ -56,9 +56,9 @@
                     <a href="{{ route('classes.subjects.index', $class) }}" class="btn btn-info">
                         <i class="fas fa-book mr-2"></i>Assign Subjects
                     </a>
-                    <button type="button" class="btn btn-success" @click="activeTab = 'timetable'">
-                        <i class="fas fa-calendar-alt mr-2"></i>Timetable
-                    </button>
+                    <a href="{{ route('classes.timetable.index', $class) }}" class="btn btn-success">
+                        <i class="fas fa-calendar-alt mr-2"></i>Manage Timetable
+                    </a>
                 </div>
             </div>
         </div>
@@ -337,16 +337,11 @@
             <div x-show="activeTab === 'timetable'" x-transition>
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-lg font-semibold text-gray-900">
-                        <i class="fas fa-calendar-alt mr-2 text-primary-600"></i>Weekly Timetable
+                        <i class="fas fa-calendar-alt mr-2 text-primary-600"></i>Weekly Timetable ({{ $class->timetables->count() }} periods)
                     </h3>
-                    <div class="flex items-center gap-2">
-                        <button type="button" class="btn btn-outline">
-                            <i class="fas fa-download mr-2"></i>Export PDF
-                        </button>
-                        <button type="button" class="btn btn-primary">
-                            <i class="fas fa-edit mr-2"></i>Edit Timetable
-                        </button>
-                    </div>
+                    <a href="{{ route('classes.timetable.index', $class) }}" class="btn btn-primary">
+                        <i class="fas fa-cog mr-2"></i>Manage Timetable
+                    </a>
                 </div>
 
                 <!-- Timetable Grid -->
@@ -419,21 +414,24 @@
                 <div class="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg">
                     <i class="fas fa-calendar-alt text-6xl text-gray-300 mb-4"></i>
                     <p class="text-gray-600 mb-4">No timetable created yet</p>
-                    <button type="button" class="btn btn-primary">
+                    <p class="text-sm text-gray-500 mb-4">Start building the weekly schedule by adding periods</p>
+                    <a href="{{ route('classes.timetable.index', $class) }}" class="btn btn-primary">
                         <i class="fas fa-plus mr-2"></i>Create Timetable
-                    </button>
+                    </a>
                 </div>
                 @endif
 
+                @if($class->timetables->count() > 0)
                 <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                     <div class="flex items-start gap-3">
                         <i class="fas fa-info-circle text-blue-600 mt-1"></i>
                         <div>
-                            <p class="text-sm font-semibold text-blue-900">Timetable Information</p>
-                            <p class="text-sm text-blue-700 mt-1">Click on any period to edit the subject or assigned teacher. Changes are saved automatically.</p>
+                            <p class="text-sm font-semibold text-blue-900">Timetable Overview</p>
+                            <p class="text-sm text-blue-700 mt-1">This is a read-only view of the weekly timetable. Click "Manage Timetable" above to add, edit, or delete periods.</p>
                         </div>
                     </div>
                 </div>
+                @endif
             </div>
 
             <!-- Students Tab -->

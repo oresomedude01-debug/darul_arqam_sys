@@ -6,6 +6,7 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\ClassController;
 use App\Http\Controllers\ClassSubjectController;
+use App\Http\Controllers\TimetableController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\GradeController;
@@ -52,6 +53,13 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/classes/{class}/subjects', [ClassSubjectController::class, 'store'])->name('classes.subjects.store');
     Route::put('/classes/{class}/subjects/{subject}', [ClassSubjectController::class, 'update'])->name('classes.subjects.update');
     Route::delete('/classes/{class}/subjects/{subject}', [ClassSubjectController::class, 'destroy'])->name('classes.subjects.destroy');
+
+    // Timetable Management
+    Route::get('/classes/{class}/timetable', [TimetableController::class, 'index'])->name('classes.timetable.index');
+    Route::post('/classes/{class}/timetable', [TimetableController::class, 'store'])->name('classes.timetable.store');
+    Route::post('/classes/{class}/timetable/bulk', [TimetableController::class, 'bulkStore'])->name('classes.timetable.bulk-store');
+    Route::put('/classes/{class}/timetable/{timetable}', [TimetableController::class, 'update'])->name('classes.timetable.update');
+    Route::delete('/classes/{class}/timetable/{timetable}', [TimetableController::class, 'destroy'])->name('classes.timetable.destroy');
 
     // Subjects Management
     Route::resource('subjects', SubjectController::class);
