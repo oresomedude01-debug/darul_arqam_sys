@@ -113,7 +113,19 @@ class ClassController extends Controller
      */
     public function show(SchoolClass $class)
     {
-        $class->load('classTeacher', 'students');
+        $class->load([
+            'classTeacher',
+            'students',
+            'subjects' => function($query) {
+                $query->orderBy('name');
+            },
+            'timetables' => function($query) {
+                $query->orderBy('day_of_week')
+                      ->orderBy('start_time');
+            },
+            'timetables.subject',
+            'timetables.teacher'
+        ]);
 
         return view('classes.show', compact('class'));
     }

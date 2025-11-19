@@ -298,28 +298,22 @@
                 </div>
 
                 <!-- Subjects Grid -->
+                @if($class->subjects->count() > 0)
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    @php
-                        $demoSubjects = [
-                            ['name' => 'Mathematics', 'teacher' => 'Mr. Ahmed Ibrahim', 'periods' => 5, 'color' => 'blue'],
-                            ['name' => 'English Language', 'teacher' => 'Mrs. Fatima Hassan', 'periods' => 4, 'color' => 'green'],
-                            ['name' => 'Basic Science', 'teacher' => 'Dr. Mohammed Ali', 'periods' => 3, 'color' => 'purple'],
-                            ['name' => 'Social Studies', 'teacher' => 'Miss Aisha Yusuf', 'periods' => 3, 'color' => 'orange'],
-                            ['name' => 'Arabic', 'teacher' => 'Sheikh Omar Abdullah', 'periods' => 4, 'color' => 'indigo'],
-                            ['name' => 'Islamic Studies', 'teacher' => 'Ustadh Bilal Musa', 'periods' => 3, 'color' => 'teal'],
-                        ];
-                    @endphp
-
-                    @foreach($demoSubjects as $subject)
-                    <div class="bg-white border-l-4 border-{{ $subject['color'] }}-500 rounded-lg p-4 hover:shadow-md transition-shadow">
+                    @foreach($class->subjects as $subject)
+                    <div class="bg-white border-l-4 border-{{ $subject->color }}-500 rounded-lg p-4 hover:shadow-md transition-shadow">
                         <div class="flex items-start justify-between mb-3">
                             <div class="flex-1">
-                                <h4 class="font-semibold text-gray-900">{{ $subject['name'] }}</h4>
+                                <h4 class="font-semibold text-gray-900">{{ $subject->name }}</h4>
+                                @php
+                                    $teacher = $subject->pivot->teacher_id ? \App\Models\Teacher::find($subject->pivot->teacher_id) : null;
+                                @endphp
                                 <p class="text-sm text-gray-600 mt-1">
-                                    <i class="fas fa-user mr-1"></i>{{ $subject['teacher'] }}
+                                    <i class="fas fa-user mr-1"></i>
+                                    {{ $teacher ? $teacher->full_name : 'Not assigned' }}
                                 </p>
                             </div>
-                            <span class="badge badge-{{ $subject['color'] }}">{{ $subject['periods'] }} periods/week</span>
+                            <span class="badge badge-{{ $subject->color }}">{{ $subject->pivot->periods_per_week }} periods/week</span>
                         </div>
                         <div class="flex items-center gap-2">
                             <button type="button" class="btn btn-xs btn-outline flex-1">
@@ -332,8 +326,7 @@
                     </div>
                     @endforeach
                 </div>
-
-                @if(count($demoSubjects) === 0)
+                @else
                 <div class="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg">
                     <i class="fas fa-book text-6xl text-gray-300 mb-4"></i>
                     <p class="text-gray-600 mb-4">No subjects assigned yet</p>
@@ -361,6 +354,7 @@
                 </div>
 
                 <!-- Timetable Grid -->
+                @if($class->timetables->count() > 0)
                 <div class="overflow-x-auto">
                     <table class="min-w-full bg-white border border-gray-200">
                         <thead class="bg-gray-50">
@@ -375,39 +369,65 @@
                         </thead>
                         <tbody class="divide-y divide-gray-200">
                             @php
-                                $timeSlots = [
-                                    '8:00 - 9:00' => ['Mathematics', 'English', 'Mathematics', 'Science', 'Arabic'],
-                                    '9:00 - 10:00' => ['English', 'Mathematics', 'English', 'Mathematics', 'Islamic Studies'],
-                                    '10:00 - 10:30' => ['BREAK', 'BREAK', 'BREAK', 'BREAK', 'BREAK'],
-                                    '10:30 - 11:30' => ['Science', 'Arabic', 'Social Studies', 'English', 'Mathematics'],
-                                    '11:30 - 12:30' => ['Arabic', 'Science', 'Arabic', 'Social Studies', 'English'],
-                                    '12:30 - 1:00' => ['LUNCH', 'LUNCH', 'LUNCH', 'LUNCH', 'LUNCH'],
-                                    '1:00 - 2:00' => ['Islamic Studies', 'Social Studies', 'Science', 'Arabic', 'Science'],
-                                ];
+                                // Group timetable entries by period number and day
+                                $timetableGrid = [];
+                                $days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+
+                                foreach($class->timetables as $entry) {
+                                    $timeSlot = $entry->start_time->format('H:i') . ' - ' . $entry->end_time->format('H:i');
+                                    if (!isset($timetableGrid[$timeSlot])) {
+                                        $timetableGrid[$timeSlot] = [
+                                            'period_number' => $entry->period_number,
+                                            'entries' => []
+                                        ];
+                                    }
+                                    $timetableGrid[$timeSlot]['entries'][$entry->day_of_week] = $entry;
+                                }
+
+                                // Sort by period number
+                                uasort($timetableGrid, function($a, $b) {
+                                    return $a['period_number'] <=> $b['period_number'];
+                                });
                             @endphp
 
-                            @foreach($timeSlots as $time => $periods)
+                            @foreach($timetableGrid as $timeSlot => $data)
                             <tr class="hover:bg-gray-50 transition-colors">
-                                <td class="px-4 py-3 text-sm font-medium text-gray-900 border-r border-gray-200 whitespace-nowrap">{{ $time }}</td>
-                                @foreach($periods as $period)
-                                    @if($period === 'BREAK' || $period === 'LUNCH')
+                                <td class="px-4 py-3 text-sm font-medium text-gray-900 border-r border-gray-200 whitespace-nowrap">{{ $timeSlot }}</td>
+                                @foreach($days as $day)
+                                    @php
+                                        $entry = $data['entries'][$day] ?? null;
+                                    @endphp
                                     <td class="px-4 py-3 text-center border-r border-gray-200 last:border-r-0">
-                                        <div class="bg-gray-100 rounded px-2 py-1 text-xs font-semibold text-gray-600">{{ $period }}</div>
+                                        @if($entry)
+                                            @if($entry->type === 'break' || $entry->type === 'lunch')
+                                                <div class="bg-gray-100 rounded px-2 py-1 text-xs font-semibold text-gray-600 uppercase">{{ $entry->type }}</div>
+                                            @elseif($entry->type === 'assembly')
+                                                <div class="bg-purple-100 rounded px-2 py-1 text-xs font-semibold text-purple-600 uppercase">Assembly</div>
+                                            @else
+                                                <div class="bg-blue-50 border border-blue-200 rounded px-2 py-2 hover:bg-blue-100 cursor-pointer transition-colors">
+                                                    <p class="text-sm font-semibold text-blue-900">{{ $entry->subject ? $entry->subject->name : 'No Subject' }}</p>
+                                                    <p class="text-xs text-blue-600 mt-0.5">{{ $entry->teacher ? $entry->teacher->full_name : 'No Teacher' }}</p>
+                                                </div>
+                                            @endif
+                                        @else
+                                            <div class="text-gray-400 text-xs">-</div>
+                                        @endif
                                     </td>
-                                    @else
-                                    <td class="px-4 py-3 text-center border-r border-gray-200 last:border-r-0">
-                                        <div class="bg-blue-50 border border-blue-200 rounded px-2 py-2 hover:bg-blue-100 cursor-pointer transition-colors">
-                                            <p class="text-sm font-semibold text-blue-900">{{ $period }}</p>
-                                            <p class="text-xs text-blue-600 mt-0.5">Teacher Name</p>
-                                        </div>
-                                    </td>
-                                    @endif
                                 @endforeach
                             </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
+                @else
+                <div class="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg">
+                    <i class="fas fa-calendar-alt text-6xl text-gray-300 mb-4"></i>
+                    <p class="text-gray-600 mb-4">No timetable created yet</p>
+                    <button type="button" class="btn btn-primary">
+                        <i class="fas fa-plus mr-2"></i>Create Timetable
+                    </button>
+                </div>
+                @endif
 
                 <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                     <div class="flex items-start gap-3">

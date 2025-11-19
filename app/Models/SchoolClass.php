@@ -89,6 +89,24 @@ class SchoolClass extends Model
     }
 
     /**
+     * Relationship: Subjects (many-to-many)
+     */
+    public function subjects()
+    {
+        return $this->belongsToMany(Subject::class, 'class_subjects', 'school_class_id', 'subject_id')
+            ->withPivot('teacher_id', 'periods_per_week')
+            ->withTimestamps();
+    }
+
+    /**
+     * Relationship: Timetable entries
+     */
+    public function timetables()
+    {
+        return $this->hasMany(Timetable::class, 'school_class_id');
+    }
+
+    /**
      * Scope: Active classes
      */
     public function scopeActive($query)
