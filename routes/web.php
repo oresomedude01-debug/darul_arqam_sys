@@ -10,6 +10,7 @@ use App\Http\Controllers\TimetableController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\GradeController;
+use App\Http\Controllers\EventController;
 use App\Http\Controllers\TokenController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\LandingController;
@@ -89,6 +90,21 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/grades/exam-types', [GradeController::class, 'storeExamType'])->name('grades.exam-types.store');
     Route::put('/grades/exam-types/{examType}', [GradeController::class, 'updateExamType'])->name('grades.exam-types.update');
     Route::delete('/grades/exam-types/{examType}', [GradeController::class, 'destroyExamType'])->name('grades.exam-types.destroy');
+
+    // Academic Calendar & Events Management
+    Route::get('/calendar', [EventController::class, 'index'])->name('calendar.index');
+    Route::get('/calendar/events-data', [EventController::class, 'getEvents'])->name('calendar.events.data');
+    Route::get('/calendar/events', [EventController::class, 'eventsList'])->name('calendar.events.list');
+    Route::get('/calendar/events/{event}', [EventController::class, 'show'])->name('calendar.events.show');
+    Route::post('/calendar/events', [EventController::class, 'store'])->name('calendar.events.store');
+    Route::put('/calendar/events/{event}', [EventController::class, 'update'])->name('calendar.events.update');
+    Route::delete('/calendar/events/{event}', [EventController::class, 'destroy'])->name('calendar.events.destroy');
+
+    // Academic Terms Management
+    Route::get('/calendar/terms', [EventController::class, 'terms'])->name('calendar.terms');
+    Route::post('/calendar/terms', [EventController::class, 'storeTerm'])->name('calendar.terms.store');
+    Route::put('/calendar/terms/{term}', [EventController::class, 'updateTerm'])->name('calendar.terms.update');
+    Route::delete('/calendar/terms/{term}', [EventController::class, 'destroyTerm'])->name('calendar.terms.destroy');
 
     // Registration Tokens Management
     Route::resource('tokens', TokenController::class);
