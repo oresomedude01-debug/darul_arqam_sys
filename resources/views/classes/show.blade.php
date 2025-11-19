@@ -11,7 +11,7 @@
 @endsection
 
 @section('content')
-<div class="space-y-6">
+<div x-data="{ activeTab: 'overview' }" class="space-y-6">
     <!-- Header Section -->
     <div class="card">
         <div class="card-body">
@@ -53,260 +53,413 @@
                     <a href="{{ route('classes.edit', $class) }}" class="btn btn-primary">
                         <i class="fas fa-edit mr-2"></i>Edit
                     </a>
-                    <form action="{{ route('classes.destroy', $class) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this class?')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger">
-                            <i class="fas fa-trash mr-2"></i>Delete
-                        </button>
-                    </form>
+                    <button type="button" class="btn btn-info" @click="activeTab = 'subjects'">
+                        <i class="fas fa-book mr-2"></i>Manage Subjects
+                    </button>
+                    <button type="button" class="btn btn-success" @click="activeTab = 'timetable'">
+                        <i class="fas fa-calendar-alt mr-2"></i>Timetable
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Left Column -->
-        <div class="lg:col-span-2 space-y-6">
-            <!-- Enrollment Overview -->
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="text-lg font-semibold text-gray-900">
-                        <i class="fas fa-users mr-2 text-primary-600"></i>Enrollment Overview
-                    </h3>
-                </div>
-                <div class="card-body">
-                    <div class="space-y-4">
-                        <!-- Enrollment Stats -->
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div class="bg-blue-50 rounded-lg p-4">
-                                <p class="text-sm font-semibold text-blue-600 mb-1">Total Capacity</p>
-                                <p class="text-3xl font-bold text-blue-700">{{ $class->capacity }}</p>
-                            </div>
-                            <div class="bg-green-50 rounded-lg p-4">
-                                <p class="text-sm font-semibold text-green-600 mb-1">Current Students</p>
-                                <p class="text-3xl font-bold text-green-700">{{ $class->current_enrollment }}</p>
-                            </div>
-                            <div class="bg-purple-50 rounded-lg p-4">
-                                <p class="text-sm font-semibold text-purple-600 mb-1">Available Seats</p>
-                                <p class="text-3xl font-bold text-purple-700">{{ $class->available_seats }}</p>
+    <!-- Tabs Navigation -->
+    <div class="card">
+        <div class="border-b border-gray-200">
+            <nav class="flex space-x-4 px-6" aria-label="Tabs">
+                <button
+                    @click="activeTab = 'overview'"
+                    :class="activeTab === 'overview' ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                    class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors"
+                >
+                    <i class="fas fa-chart-pie mr-2"></i>Overview
+                </button>
+                <button
+                    @click="activeTab = 'subjects'"
+                    :class="activeTab === 'subjects' ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                    class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors"
+                >
+                    <i class="fas fa-book mr-2"></i>Subjects
+                </button>
+                <button
+                    @click="activeTab = 'timetable'"
+                    :class="activeTab === 'timetable' ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                    class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors"
+                >
+                    <i class="fas fa-calendar-alt mr-2"></i>Timetable
+                </button>
+                <button
+                    @click="activeTab = 'students'"
+                    :class="activeTab === 'students' ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                    class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors"
+                >
+                    <i class="fas fa-users mr-2"></i>Students <span class="ml-1 bg-gray-200 rounded-full px-2 py-0.5 text-xs">{{ $class->current_enrollment }}</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="card-body">
+            <!-- Overview Tab -->
+            <div x-show="activeTab === 'overview'" x-transition class="space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Left Column -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <!-- Enrollment Overview -->
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                                <i class="fas fa-users mr-2 text-primary-600"></i>Enrollment Overview
+                            </h3>
+                            <div class="space-y-4">
+                                <!-- Enrollment Stats -->
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div class="bg-blue-50 rounded-lg p-4">
+                                        <p class="text-sm font-semibold text-blue-600 mb-1">Total Capacity</p>
+                                        <p class="text-3xl font-bold text-blue-700">{{ $class->capacity }}</p>
+                                    </div>
+                                    <div class="bg-green-50 rounded-lg p-4">
+                                        <p class="text-sm font-semibold text-green-600 mb-1">Current Students</p>
+                                        <p class="text-3xl font-bold text-green-700">{{ $class->current_enrollment }}</p>
+                                    </div>
+                                    <div class="bg-purple-50 rounded-lg p-4">
+                                        <p class="text-sm font-semibold text-purple-600 mb-1">Available Seats</p>
+                                        <p class="text-3xl font-bold text-purple-700">{{ $class->available_seats }}</p>
+                                    </div>
+                                </div>
+
+                                <!-- Enrollment Progress -->
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-sm font-semibold text-gray-700">Enrollment Progress</span>
+                                        <span class="text-sm font-semibold {{ $class->is_full ? 'text-red-600' : 'text-gray-600' }}">
+                                            {{ $class->enrollment_percentage }}%
+                                            @if($class->is_full)
+                                                (Full)
+                                            @endif
+                                        </span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-4">
+                                        <div
+                                            class="h-4 rounded-full transition-all duration-300 {{ $class->is_full ? 'bg-red-500' : ($class->enrollment_percentage >= 80 ? 'bg-yellow-500' : 'bg-green-500') }}"
+                                            style="width: {{ min($class->enrollment_percentage, 100) }}%"
+                                        ></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Enrollment Progress -->
+                        <!-- Class Teacher -->
+                        @if($class->classTeacher)
                         <div>
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="text-sm font-semibold text-gray-700">Enrollment Progress</span>
-                                <span class="text-sm font-semibold {{ $class->is_full ? 'text-red-600' : 'text-gray-600' }}">
-                                    {{ $class->enrollment_percentage }}%
-                                    @if($class->is_full)
-                                        (Full)
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                                <i class="fas fa-chalkboard-teacher mr-2 text-primary-600"></i>Class Teacher
+                            </h3>
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <div class="flex items-center space-x-4">
+                                    @if($class->classTeacher->profile_picture)
+                                        <img src="{{ asset('storage/' . $class->classTeacher->profile_picture) }}" alt="{{ $class->classTeacher->full_name }}" class="w-16 h-16 rounded-full object-cover">
+                                    @else
+                                        <div class="w-16 h-16 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-bold text-xl">
+                                            {{ substr($class->classTeacher->first_name, 0, 1) }}{{ substr($class->classTeacher->last_name, 0, 1) }}
+                                        </div>
                                     @endif
-                                </span>
+                                    <div class="flex-1">
+                                        <h4 class="font-semibold text-gray-900 text-lg">{{ $class->classTeacher->full_name }}</h4>
+                                        <p class="text-gray-600 text-sm">
+                                            <i class="fas fa-envelope mr-2"></i>{{ $class->classTeacher->email }}
+                                        </p>
+                                        <p class="text-gray-600 text-sm">
+                                            <i class="fas fa-phone mr-2"></i>{{ $class->classTeacher->phone }}
+                                        </p>
+                                    </div>
+                                    <a href="{{ route('teachers.show', $class->classTeacher) }}" class="btn btn-sm btn-outline">
+                                        View Profile
+                                    </a>
+                                </div>
                             </div>
-                            <div class="w-full bg-gray-200 rounded-full h-4">
-                                <div
-                                    class="h-4 rounded-full transition-all duration-300 {{ $class->is_full ? 'bg-red-500' : ($class->enrollment_percentage >= 80 ? 'bg-yellow-500' : 'bg-green-500') }}"
-                                    style="width: {{ min($class->enrollment_percentage, 100) }}%"
-                                ></div>
+                        </div>
+                        @else
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                            <i class="fas fa-user-slash text-4xl text-gray-300 mb-3"></i>
+                            <p class="text-gray-600">No class teacher assigned</p>
+                            <a href="{{ route('classes.edit', $class) }}" class="btn btn-sm btn-primary mt-3">
+                                <i class="fas fa-plus mr-1"></i>Assign Teacher
+                            </a>
+                        </div>
+                        @endif
+
+                        <!-- Description -->
+                        @if($class->description)
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                                <i class="fas fa-sticky-note mr-2 text-primary-600"></i>Description
+                            </h3>
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <p class="text-gray-900 whitespace-pre-wrap">{{ $class->description }}</p>
+                            </div>
+                        </div>
+                        @endif
+                    </div>
+
+                    <!-- Right Column - Quick Stats -->
+                    <div class="space-y-6">
+                        <!-- Quick Stats -->
+                        <div class="bg-gradient-to-br from-primary-50 to-blue-50 rounded-lg p-6">
+                            <h4 class="text-sm font-semibold text-gray-700 mb-4">Quick Stats</h4>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-gray-600 text-sm">Students</span>
+                                    <span class="text-2xl font-bold text-primary-600">{{ $class->current_enrollment }}</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-gray-600 text-sm">Capacity</span>
+                                    <span class="text-2xl font-bold text-primary-600">{{ $class->capacity }}</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-gray-600 text-sm">Utilization</span>
+                                    <span class="text-2xl font-bold text-primary-600">{{ $class->enrollment_percentage }}%</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-gray-600 text-sm">Status</span>
+                                    @if($class->status === 'active')
+                                        <span class="badge badge-success">Active</span>
+                                    @elseif($class->status === 'archived')
+                                        <span class="badge badge-secondary">Archived</span>
+                                    @else
+                                        <span class="badge badge-warning">Inactive</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Class Schedule -->
+                        @if($class->start_time || $class->end_time)
+                        <div class="bg-white border border-gray-200 rounded-lg p-6">
+                            <h4 class="text-sm font-semibold text-gray-700 mb-4">
+                                <i class="fas fa-clock mr-2 text-primary-600"></i>Schedule
+                            </h4>
+                            <div class="space-y-3">
+                                @if($class->start_time)
+                                <div>
+                                    <p class="text-sm font-semibold text-gray-600 mb-1">Start Time</p>
+                                    <p class="text-gray-900">{{ $class->start_time->format('g:i A') }}</p>
+                                </div>
+                                @endif
+
+                                @if($class->end_time)
+                                <div>
+                                    <p class="text-sm font-semibold text-gray-600 mb-1">End Time</p>
+                                    <p class="text-gray-900">{{ $class->end_time->format('g:i A') }}</p>
+                                </div>
+                                @endif
+
+                                @if($class->start_time && $class->end_time)
+                                <div class="pt-3 border-t border-gray-200">
+                                    <p class="text-sm font-semibold text-gray-600 mb-1">Duration</p>
+                                    <p class="text-gray-900">
+                                        {{ $class->start_time->diff($class->end_time)->format('%h hours %i minutes') }}
+                                    </p>
+                                </div>
+                                @endif
+                            </div>
+                        </div>
+                        @endif
+
+                        <!-- System Information -->
+                        <div class="bg-white border border-gray-200 rounded-lg p-6">
+                            <h4 class="text-sm font-semibold text-gray-700 mb-4">
+                                <i class="fas fa-database mr-2 text-primary-600"></i>System Info
+                            </h4>
+                            <div class="space-y-3">
+                                <div>
+                                    <p class="text-sm font-semibold text-gray-600 mb-1">Created</p>
+                                    <p class="text-gray-900 text-sm">{{ $class->created_at->format('M d, Y') }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-semibold text-gray-600 mb-1">Last Updated</p>
+                                    <p class="text-gray-900 text-sm">{{ $class->updated_at->format('M d, Y') }}</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Class Teacher -->
-            @if($class->classTeacher)
-            <div class="card">
-                <div class="card-header">
+            <!-- Subjects Tab -->
+            <div x-show="activeTab === 'subjects'" x-transition>
+                <div class="flex items-center justify-between mb-6">
                     <h3 class="text-lg font-semibold text-gray-900">
-                        <i class="fas fa-chalkboard-teacher mr-2 text-primary-600"></i>Class Teacher
+                        <i class="fas fa-book mr-2 text-primary-600"></i>Assigned Subjects
                     </h3>
+                    <button type="button" class="btn btn-primary">
+                        <i class="fas fa-plus mr-2"></i>Add Subject
+                    </button>
                 </div>
-                <div class="card-body">
-                    <div class="flex items-center space-x-4">
-                        @if($class->classTeacher->profile_picture)
-                            <img src="{{ asset('storage/' . $class->classTeacher->profile_picture) }}" alt="{{ $class->classTeacher->full_name }}" class="w-16 h-16 rounded-full object-cover">
-                        @else
-                            <div class="w-16 h-16 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-bold text-xl">
-                                {{ substr($class->classTeacher->first_name, 0, 1) }}{{ substr($class->classTeacher->last_name, 0, 1) }}
+
+                <!-- Subjects Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    @php
+                        $demoSubjects = [
+                            ['name' => 'Mathematics', 'teacher' => 'Mr. Ahmed Ibrahim', 'periods' => 5, 'color' => 'blue'],
+                            ['name' => 'English Language', 'teacher' => 'Mrs. Fatima Hassan', 'periods' => 4, 'color' => 'green'],
+                            ['name' => 'Basic Science', 'teacher' => 'Dr. Mohammed Ali', 'periods' => 3, 'color' => 'purple'],
+                            ['name' => 'Social Studies', 'teacher' => 'Miss Aisha Yusuf', 'periods' => 3, 'color' => 'orange'],
+                            ['name' => 'Arabic', 'teacher' => 'Sheikh Omar Abdullah', 'periods' => 4, 'color' => 'indigo'],
+                            ['name' => 'Islamic Studies', 'teacher' => 'Ustadh Bilal Musa', 'periods' => 3, 'color' => 'teal'],
+                        ];
+                    @endphp
+
+                    @foreach($demoSubjects as $subject)
+                    <div class="bg-white border-l-4 border-{{ $subject['color'] }}-500 rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-gray-900">{{ $subject['name'] }}</h4>
+                                <p class="text-sm text-gray-600 mt-1">
+                                    <i class="fas fa-user mr-1"></i>{{ $subject['teacher'] }}
+                                </p>
                             </div>
-                        @endif
-                        <div class="flex-1">
-                            <h4 class="font-semibold text-gray-900 text-lg">{{ $class->classTeacher->full_name }}</h4>
-                            <p class="text-gray-600 text-sm">
-                                <i class="fas fa-envelope mr-2"></i>{{ $class->classTeacher->email }}
-                            </p>
-                            <p class="text-gray-600 text-sm">
-                                <i class="fas fa-phone mr-2"></i>{{ $class->classTeacher->phone }}
-                            </p>
+                            <span class="badge badge-{{ $subject['color'] }}">{{ $subject['periods'] }} periods/week</span>
                         </div>
-                        <a href="{{ route('teachers.show', $class->classTeacher) }}" class="btn btn-sm btn-outline">
+                        <div class="flex items-center gap-2">
+                            <button type="button" class="btn btn-xs btn-outline flex-1">
+                                <i class="fas fa-edit mr-1"></i>Edit
+                            </button>
+                            <button type="button" class="btn btn-xs btn-danger">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+
+                @if(count($demoSubjects) === 0)
+                <div class="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg">
+                    <i class="fas fa-book text-6xl text-gray-300 mb-4"></i>
+                    <p class="text-gray-600 mb-4">No subjects assigned yet</p>
+                    <button type="button" class="btn btn-primary">
+                        <i class="fas fa-plus mr-2"></i>Add First Subject
+                    </button>
+                </div>
+                @endif
+            </div>
+
+            <!-- Timetable Tab -->
+            <div x-show="activeTab === 'timetable'" x-transition>
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900">
+                        <i class="fas fa-calendar-alt mr-2 text-primary-600"></i>Weekly Timetable
+                    </h3>
+                    <div class="flex items-center gap-2">
+                        <button type="button" class="btn btn-outline">
+                            <i class="fas fa-download mr-2"></i>Export PDF
+                        </button>
+                        <button type="button" class="btn btn-primary">
+                            <i class="fas fa-edit mr-2"></i>Edit Timetable
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Timetable Grid -->
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border border-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-r border-gray-200">Time</th>
+                                <th class="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider border-r border-gray-200">Monday</th>
+                                <th class="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider border-r border-gray-200">Tuesday</th>
+                                <th class="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider border-r border-gray-200">Wednesday</th>
+                                <th class="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider border-r border-gray-200">Thursday</th>
+                                <th class="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Friday</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            @php
+                                $timeSlots = [
+                                    '8:00 - 9:00' => ['Mathematics', 'English', 'Mathematics', 'Science', 'Arabic'],
+                                    '9:00 - 10:00' => ['English', 'Mathematics', 'English', 'Mathematics', 'Islamic Studies'],
+                                    '10:00 - 10:30' => ['BREAK', 'BREAK', 'BREAK', 'BREAK', 'BREAK'],
+                                    '10:30 - 11:30' => ['Science', 'Arabic', 'Social Studies', 'English', 'Mathematics'],
+                                    '11:30 - 12:30' => ['Arabic', 'Science', 'Arabic', 'Social Studies', 'English'],
+                                    '12:30 - 1:00' => ['LUNCH', 'LUNCH', 'LUNCH', 'LUNCH', 'LUNCH'],
+                                    '1:00 - 2:00' => ['Islamic Studies', 'Social Studies', 'Science', 'Arabic', 'Science'],
+                                ];
+                            @endphp
+
+                            @foreach($timeSlots as $time => $periods)
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-4 py-3 text-sm font-medium text-gray-900 border-r border-gray-200 whitespace-nowrap">{{ $time }}</td>
+                                @foreach($periods as $period)
+                                    @if($period === 'BREAK' || $period === 'LUNCH')
+                                    <td class="px-4 py-3 text-center border-r border-gray-200 last:border-r-0">
+                                        <div class="bg-gray-100 rounded px-2 py-1 text-xs font-semibold text-gray-600">{{ $period }}</div>
+                                    </td>
+                                    @else
+                                    <td class="px-4 py-3 text-center border-r border-gray-200 last:border-r-0">
+                                        <div class="bg-blue-50 border border-blue-200 rounded px-2 py-2 hover:bg-blue-100 cursor-pointer transition-colors">
+                                            <p class="text-sm font-semibold text-blue-900">{{ $period }}</p>
+                                            <p class="text-xs text-blue-600 mt-0.5">Teacher Name</p>
+                                        </div>
+                                    </td>
+                                    @endif
+                                @endforeach
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div class="flex items-start gap-3">
+                        <i class="fas fa-info-circle text-blue-600 mt-1"></i>
+                        <div>
+                            <p class="text-sm font-semibold text-blue-900">Timetable Information</p>
+                            <p class="text-sm text-blue-700 mt-1">Click on any period to edit the subject or assigned teacher. Changes are saved automatically.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Students Tab -->
+            <div x-show="activeTab === 'students'" x-transition>
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900">
+                        <i class="fas fa-users mr-2 text-primary-600"></i>Enrolled Students ({{ $class->current_enrollment }})
+                    </h3>
+                    <a href="{{ route('students.index', ['class_level' => $class->name, 'section' => $class->section]) }}" class="btn btn-primary">
+                        <i class="fas fa-external-link-alt mr-2"></i>View Full List
+                    </a>
+                </div>
+
+                @if($class->students->count() > 0)
+                <div class="space-y-3">
+                    @foreach($class->students as $student)
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-semibold">
+                                {{ substr($student->first_name, 0, 1) }}{{ substr($student->last_name, 0, 1) }}
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-900">{{ $student->full_name }}</p>
+                                <p class="text-sm text-gray-600">
+                                    <span class="font-mono">{{ $student->admission_number }}</span>
+                                    <span class="mx-2">•</span>
+                                    <span>{{ $student->email }}</span>
+                                </p>
+                            </div>
+                        </div>
+                        <a href="{{ route('students.show', $student) }}" class="btn btn-sm btn-outline">
                             View Profile
                         </a>
                     </div>
+                    @endforeach
                 </div>
-            </div>
-            @else
-            <div class="card border-dashed">
-                <div class="card-body text-center py-8">
-                    <i class="fas fa-user-slash text-4xl text-gray-300 mb-3"></i>
-                    <p class="text-gray-600">No class teacher assigned</p>
-                    <a href="{{ route('classes.edit', $class) }}" class="btn btn-sm btn-primary mt-3">
-                        <i class="fas fa-plus mr-1"></i>Assign Teacher
-                    </a>
+                @else
+                <div class="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg">
+                    <i class="fas fa-user-graduate text-6xl text-gray-300 mb-4"></i>
+                    <p class="text-gray-600">No students enrolled yet</p>
                 </div>
-            </div>
-            @endif
-
-            <!-- Students List -->
-            <div class="card">
-                <div class="card-header flex items-center justify-between">
-                    <h3 class="text-lg font-semibold text-gray-900">
-                        <i class="fas fa-user-graduate mr-2 text-primary-600"></i>Students ({{ $class->students->count() }})
-                    </h3>
-                    <a href="{{ route('students.index', ['class_level' => $class->name, 'section' => $class->section]) }}" class="btn btn-sm btn-outline">
-                        View All
-                    </a>
-                </div>
-                <div class="card-body">
-                    @if($class->students->count() > 0)
-                        <div class="space-y-3">
-                            @foreach($class->students->take(5) as $student)
-                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-semibold">
-                                        {{ substr($student->first_name, 0, 1) }}{{ substr($student->last_name, 0, 1) }}
-                                    </div>
-                                    <div>
-                                        <p class="font-semibold text-gray-900">{{ $student->full_name }}</p>
-                                        <p class="text-sm text-gray-600">{{ $student->admission_number }}</p>
-                                    </div>
-                                </div>
-                                <a href="{{ route('students.show', $student) }}" class="btn btn-xs btn-outline">
-                                    View
-                                </a>
-                            </div>
-                            @endforeach
-
-                            @if($class->students->count() > 5)
-                            <div class="text-center pt-2">
-                                <a href="{{ route('students.index', ['class_level' => $class->name, 'section' => $class->section]) }}" class="text-primary-600 hover:text-primary-700 text-sm font-semibold">
-                                    View all {{ $class->students->count() }} students →
-                                </a>
-                            </div>
-                            @endif
-                        </div>
-                    @else
-                        <div class="text-center py-8 text-gray-500">
-                            <i class="fas fa-user-graduate text-4xl mb-3 text-gray-300"></i>
-                            <p>No students enrolled yet</p>
-                        </div>
-                    @endif
-                </div>
-            </div>
-
-            <!-- Description -->
-            @if($class->description)
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="text-lg font-semibold text-gray-900">
-                        <i class="fas fa-sticky-note mr-2 text-primary-600"></i>Description
-                    </h3>
-                </div>
-                <div class="card-body">
-                    <p class="text-gray-900 whitespace-pre-wrap">{{ $class->description }}</p>
-                </div>
-            </div>
-            @endif
-        </div>
-
-        <!-- Right Column -->
-        <div class="space-y-6">
-            <!-- Quick Stats -->
-            <div class="card bg-gradient-to-br from-primary-50 to-blue-50">
-                <div class="card-body">
-                    <h4 class="text-sm font-semibold text-gray-700 mb-4">Quick Stats</h4>
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="text-gray-600 text-sm">Students</span>
-                            <span class="text-2xl font-bold text-primary-600">{{ $class->current_enrollment }}</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-gray-600 text-sm">Capacity</span>
-                            <span class="text-2xl font-bold text-primary-600">{{ $class->capacity }}</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-gray-600 text-sm">Utilization</span>
-                            <span class="text-2xl font-bold text-primary-600">{{ $class->enrollment_percentage }}%</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-gray-600 text-sm">Status</span>
-                            @if($class->status === 'active')
-                                <span class="badge badge-success">Active</span>
-                            @elseif($class->status === 'archived')
-                                <span class="badge badge-secondary">Archived</span>
-                            @else
-                                <span class="badge badge-warning">Inactive</span>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Class Schedule -->
-            @if($class->start_time || $class->end_time)
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="text-lg font-semibold text-gray-900">
-                        <i class="fas fa-clock mr-2 text-primary-600"></i>Schedule
-                    </h3>
-                </div>
-                <div class="card-body space-y-3">
-                    @if($class->start_time)
-                    <div>
-                        <p class="text-sm font-semibold text-gray-600 mb-1">Start Time</p>
-                        <p class="text-gray-900">{{ $class->start_time->format('g:i A') }}</p>
-                    </div>
-                    @endif
-
-                    @if($class->end_time)
-                    <div>
-                        <p class="text-sm font-semibold text-gray-600 mb-1">End Time</p>
-                        <p class="text-gray-900">{{ $class->end_time->format('g:i A') }}</p>
-                    </div>
-                    @endif
-
-                    @if($class->start_time && $class->end_time)
-                    <div class="pt-3 border-t border-gray-200">
-                        <p class="text-sm font-semibold text-gray-600 mb-1">Duration</p>
-                        <p class="text-gray-900">
-                            {{ $class->start_time->diff($class->end_time)->format('%h hours %i minutes') }}
-                        </p>
-                    </div>
-                    @endif
-                </div>
-            </div>
-            @endif
-
-            <!-- System Information -->
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="text-lg font-semibold text-gray-900">
-                        <i class="fas fa-database mr-2 text-primary-600"></i>System Information
-                    </h3>
-                </div>
-                <div class="card-body space-y-3">
-                    <div>
-                        <p class="text-sm font-semibold text-gray-600 mb-1">Created</p>
-                        <p class="text-gray-900 text-sm">{{ $class->created_at->format('M d, Y \a\t h:i A') }}</p>
-                    </div>
-
-                    <div>
-                        <p class="text-sm font-semibold text-gray-600 mb-1">Last Updated</p>
-                        <p class="text-gray-900 text-sm">{{ $class->updated_at->format('M d, Y \a\t h:i A') }}</p>
-                    </div>
-                </div>
+                @endif
             </div>
         </div>
     </div>
