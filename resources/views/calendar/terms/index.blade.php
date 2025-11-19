@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.spa')
 
 @section('title', 'Academic Terms')
 

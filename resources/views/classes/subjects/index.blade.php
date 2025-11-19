@@ -1,4 +1,4 @@
-@extends('layouts.modern')
+@extends('layouts.spa')
 
 @section('title', 'Manage Subjects - ' . $class->full_name)
 

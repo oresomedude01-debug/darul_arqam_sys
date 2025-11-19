@@ -1,4 +1,4 @@
-@extends('layouts.modern')
+@extends('layouts.spa')
 
 @section('title', 'Manage Timetable - ' . $class->full_name)
 
