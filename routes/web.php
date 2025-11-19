@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\ClassController;
+use App\Http\Controllers\ClassSubjectController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\GradeController;
@@ -45,6 +46,12 @@ Route::middleware(['auth'])->group(function () {
     // Classes Management
     Route::resource('classes', ClassController::class);
     Route::get('/classes-export', [ClassController::class, 'exportCsv'])->name('classes.export');
+
+    // Class-Subject Assignment Management
+    Route::get('/classes/{class}/subjects', [ClassSubjectController::class, 'index'])->name('classes.subjects.index');
+    Route::post('/classes/{class}/subjects', [ClassSubjectController::class, 'store'])->name('classes.subjects.store');
+    Route::put('/classes/{class}/subjects/{subject}', [ClassSubjectController::class, 'update'])->name('classes.subjects.update');
+    Route::delete('/classes/{class}/subjects/{subject}', [ClassSubjectController::class, 'destroy'])->name('classes.subjects.destroy');
 
     // Subjects Management
     Route::resource('subjects', SubjectController::class);

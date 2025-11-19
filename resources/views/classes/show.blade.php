@@ -53,9 +53,9 @@
                     <a href="{{ route('classes.edit', $class) }}" class="btn btn-primary">
                         <i class="fas fa-edit mr-2"></i>Edit
                     </a>
-                    <button type="button" class="btn btn-info" @click="activeTab = 'subjects'">
-                        <i class="fas fa-book mr-2"></i>Manage Subjects
-                    </button>
+                    <a href="{{ route('classes.subjects.index', $class) }}" class="btn btn-info">
+                        <i class="fas fa-book mr-2"></i>Assign Subjects
+                    </a>
                     <button type="button" class="btn btn-success" @click="activeTab = 'timetable'">
                         <i class="fas fa-calendar-alt mr-2"></i>Timetable
                     </button>
@@ -290,11 +290,11 @@
             <div x-show="activeTab === 'subjects'" x-transition>
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-lg font-semibold text-gray-900">
-                        <i class="fas fa-book mr-2 text-primary-600"></i>Assigned Subjects
+                        <i class="fas fa-book mr-2 text-primary-600"></i>Assigned Subjects ({{ $class->subjects->count() }})
                     </h3>
-                    <button type="button" class="btn btn-primary">
-                        <i class="fas fa-plus mr-2"></i>Add Subject
-                    </button>
+                    <a href="{{ route('classes.subjects.index', $class) }}" class="btn btn-primary">
+                        <i class="fas fa-cog mr-2"></i>Manage Subjects
+                    </a>
                 </div>
 
                 <!-- Subjects Grid -->
@@ -315,13 +315,8 @@
                             </div>
                             <span class="badge badge-{{ $subject->color }}">{{ $subject->pivot->periods_per_week }} periods/week</span>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <button type="button" class="btn btn-xs btn-outline flex-1">
-                                <i class="fas fa-edit mr-1"></i>Edit
-                            </button>
-                            <button type="button" class="btn btn-xs btn-danger">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                        <div class="text-xs text-gray-500 mt-2">
+                            <i class="fas fa-clock mr-1"></i>{{ $subject->pivot->periods_per_week }} {{ Str::plural('period', $subject->pivot->periods_per_week) }} per week
                         </div>
                     </div>
                     @endforeach
@@ -330,9 +325,10 @@
                 <div class="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg">
                     <i class="fas fa-book text-6xl text-gray-300 mb-4"></i>
                     <p class="text-gray-600 mb-4">No subjects assigned yet</p>
-                    <button type="button" class="btn btn-primary">
-                        <i class="fas fa-plus mr-2"></i>Add First Subject
-                    </button>
+                    <p class="text-sm text-gray-500 mb-4">Start by assigning subjects to this class</p>
+                    <a href="{{ route('classes.subjects.index', $class) }}" class="btn btn-primary">
+                        <i class="fas fa-plus mr-2"></i>Assign Subjects
+                    </a>
                 </div>
                 @endif
             </div>
