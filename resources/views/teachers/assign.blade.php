@@ -1,4 +1,4 @@
-@extends('layouts.modern')
+@extends('layouts.spa')
 
 @section('title', 'Assign Classes & Subjects - ' . $teacher->full_name)
 

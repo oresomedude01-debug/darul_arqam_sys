@@ -1,4 +1,4 @@
-@extends('layouts.modern')
+@extends('layouts.spa')
 
 @section('title', $student->full_name . ' - Attendance Profile')
 

@@ -1,4 +1,4 @@
-@extends('layouts.modern')
+@extends('layouts.spa')
 
 @section('title', $class->full_name . ' - Class Profile')
 
