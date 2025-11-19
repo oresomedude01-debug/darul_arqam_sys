@@ -65,8 +65,12 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('subjects', SubjectController::class);
 
     // Attendance Management
-    Route::resource('attendance', AttendanceController::class);
-    Route::post('/attendance/mark', [AttendanceController::class, 'mark'])->name('attendance.mark');
+    Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance.index');
+    Route::get('/attendance/create', [AttendanceController::class, 'create'])->name('attendance.create');
+    Route::post('/attendance/store', [AttendanceController::class, 'store'])->name('attendance.store');
+    Route::get('/attendance/records', [AttendanceController::class, 'records'])->name('attendance.records');
+    Route::get('/attendance/student/{student}', [AttendanceController::class, 'studentProfile'])->name('attendance.student-profile');
+    Route::post('/attendance/mark-all-present', [AttendanceController::class, 'markAllPresent'])->name('attendance.mark-all-present');
 
     // Grades Management
     Route::resource('grades', GradeController::class);
