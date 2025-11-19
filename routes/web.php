@@ -73,8 +73,22 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/attendance/mark-all-present', [AttendanceController::class, 'markAllPresent'])->name('attendance.mark-all-present');
 
     // Grades Management
-    Route::resource('grades', GradeController::class);
-    Route::post('/grades/bulk-upload', [GradeController::class, 'bulkUpload'])->name('grades.bulk-upload');
+    Route::get('/grades', [GradeController::class, 'index'])->name('grades.index');
+    Route::post('/grades/store', [GradeController::class, 'store'])->name('grades.store');
+    Route::get('/grades/class-results', [GradeController::class, 'classResults'])->name('grades.class-results');
+    Route::get('/grades/student/{student}', [GradeController::class, 'studentProfile'])->name('grades.student-profile');
+
+    // Grade Scales Management
+    Route::get('/grades/scales', [GradeController::class, 'gradeScales'])->name('grades.scales');
+    Route::post('/grades/scales', [GradeController::class, 'storeGradeScale'])->name('grades.scales.store');
+    Route::put('/grades/scales/{gradeScale}', [GradeController::class, 'updateGradeScale'])->name('grades.scales.update');
+    Route::delete('/grades/scales/{gradeScale}', [GradeController::class, 'destroyGradeScale'])->name('grades.scales.destroy');
+
+    // Exam Types Management
+    Route::get('/grades/exam-types', [GradeController::class, 'examTypes'])->name('grades.exam-types');
+    Route::post('/grades/exam-types', [GradeController::class, 'storeExamType'])->name('grades.exam-types.store');
+    Route::put('/grades/exam-types/{examType}', [GradeController::class, 'updateExamType'])->name('grades.exam-types.update');
+    Route::delete('/grades/exam-types/{examType}', [GradeController::class, 'destroyExamType'])->name('grades.exam-types.destroy');
 
     // Registration Tokens Management
     Route::resource('tokens', TokenController::class);

@@ -157,6 +157,14 @@ class Student extends Model
     }
 
     /**
+     * Get all grades/results for this student
+     */
+    public function grades()
+    {
+        return $this->hasMany(Grade::class);
+    }
+
+    /**
      * Scopes
      */
     public function scopeActive($query)
