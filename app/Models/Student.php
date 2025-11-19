@@ -149,6 +149,14 @@ class Student extends Model
     }
 
     /**
+     * Get all attendance records for this student
+     */
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
+    }
+
+    /**
      * Scopes
      */
     public function scopeActive($query)
