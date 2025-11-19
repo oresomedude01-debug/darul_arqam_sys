@@ -341,15 +341,17 @@ function calculateGrade(index, score) {
 
 // Calculate grades on page load for existing scores
 window.addEventListener('DOMContentLoaded', () => {
-    @foreach($students as $index => $student)
-        @php
-            $existingGrade = $existingGrades[$student->id] ?? null;
-            $score = $existingGrade ? $existingGrade->score : '';
-        @endphp
-        @if($score)
-            calculateGrade({{ $index }}, {{ $score }});
-        @endif
-    @endforeach
+    @if($students)
+        @foreach($students as $index => $student)
+            @php
+                $existingGrade = $existingGrades[$student->id] ?? null;
+                $score = $existingGrade ? $existingGrade->score : '';
+            @endphp
+            @if($score)
+                calculateGrade({{ $index }}, {{ $score }});
+            @endif
+        @endforeach
+    @endif
 });
 
 // Warn before leaving with unsaved changes
