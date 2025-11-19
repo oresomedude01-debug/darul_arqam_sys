@@ -176,6 +176,16 @@
                 <span x-show="!sidebarCollapsed || mobileMenuOpen" class="transition-opacity">Classes</span>
             </a>
 
+            <!-- Subjects -->
+            <a href="{{ route('subjects.index') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all
+                      {{ request()->is('subjects*')
+                         ? 'bg-primary-700/50 text-white shadow-lg'
+                         : 'text-primary-100 hover:bg-primary-700/30 hover:text-white' }}">
+                <i class="fas fa-book text-base w-5"></i>
+                <span x-show="!sidebarCollapsed || mobileMenuOpen" class="transition-opacity">Subjects</span>
+            </a>
+
             <!-- Attendance -->
             <a href="{{ route('attendance.index') }}"
                class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all

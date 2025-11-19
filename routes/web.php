@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\ClassController;
+use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\GradeController;
 use App\Http\Controllers\TokenController;
@@ -44,6 +45,9 @@ Route::middleware(['auth'])->group(function () {
     // Classes Management
     Route::resource('classes', ClassController::class);
     Route::get('/classes-export', [ClassController::class, 'exportCsv'])->name('classes.export');
+
+    // Subjects Management
+    Route::resource('subjects', SubjectController::class);
 
     // Attendance Management
     Route::resource('attendance', AttendanceController::class);
