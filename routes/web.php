@@ -15,6 +15,11 @@ use App\Http\Controllers\TokenController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\LocaleController;
+use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReportsController;
+use App\Http\Controllers\LibraryController;
+use App\Http\Controllers\FinanceController;
 
 // Landing Page (Public)
 Route::get('/', [LandingController::class, 'index'])->name('landing');
@@ -111,6 +116,30 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/tokens/bulk-disable', [TokenController::class, 'bulkDisable'])->name('tokens.bulk-disable');
     Route::post('/tokens/bulk-enable', [TokenController::class, 'bulkEnable'])->name('tokens.bulk-enable');
     Route::post('/tokens/validate', [TokenController::class, 'validate'])->name('tokens.validate');
+
+    // Settings Management
+    Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
+    Route::post('/settings', [SettingsController::class, 'update'])->name('settings.update');
+
+    // Profile Management
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
+
+    // Reports Module
+    Route::get('/reports', [ReportsController::class, 'index'])->name('reports.index');
+    Route::get('/reports/attendance', [ReportsController::class, 'attendance'])->name('reports.attendance');
+    Route::get('/reports/grades', [ReportsController::class, 'grades'])->name('reports.grades');
+    Route::get('/reports/students', [ReportsController::class, 'students'])->name('reports.students');
+    Route::get('/reports/teachers', [ReportsController::class, 'teachers'])->name('reports.teachers');
+
+    // Library Module
+    Route::get('/library', [LibraryController::class, 'index'])->name('library.index');
+    Route::get('/library/lending', [LibraryController::class, 'lending'])->name('library.lending');
+
+    // Finance Module
+    Route::get('/finance', [FinanceController::class, 'index'])->name('finance.index');
+    Route::get('/finance/payments', [FinanceController::class, 'payments'])->name('finance.payments');
 });
 
 // Public Enrollment (No authentication required)

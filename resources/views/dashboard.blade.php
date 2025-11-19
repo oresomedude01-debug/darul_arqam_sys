@@ -28,9 +28,9 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-blue-100 text-sm font-medium">Total Students</p>
-                    <h3 class="text-3xl font-bold mt-2">1,234</h3>
+                    <h3 class="text-3xl font-bold mt-2">{{ number_format($totalStudents) }}</h3>
                     <p class="text-blue-100 text-xs mt-2">
-                        <i class="fas fa-arrow-up"></i> 12% from last month
+                        <i class="fas fa-users"></i> Enrolled students
                     </p>
                 </div>
                 <div class="bg-white/20 rounded-full p-4">
@@ -44,9 +44,9 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-green-100 text-sm font-medium">Total Teachers</p>
-                    <h3 class="text-3xl font-bold mt-2">87</h3>
+                    <h3 class="text-3xl font-bold mt-2">{{ number_format($totalTeachers) }}</h3>
                     <p class="text-green-100 text-xs mt-2">
-                        <i class="fas fa-arrow-up"></i> 3 new this month
+                        <i class="fas fa-chalkboard-teacher"></i> Teaching staff
                     </p>
                 </div>
                 <div class="bg-white/20 rounded-full p-4">
@@ -60,9 +60,9 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-purple-100 text-sm font-medium">Total Classes</p>
-                    <h3 class="text-3xl font-bold mt-2">45</h3>
+                    <h3 class="text-3xl font-bold mt-2">{{ number_format($totalClasses) }}</h3>
                     <p class="text-purple-100 text-xs mt-2">
-                        <i class="fas fa-minus"></i> No change
+                        <i class="fas fa-book-open"></i> Active classes
                     </p>
                 </div>
                 <div class="bg-white/20 rounded-full p-4">
@@ -76,9 +76,9 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-orange-100 text-sm font-medium">Attendance Today</p>
-                    <h3 class="text-3xl font-bold mt-2">94.5%</h3>
+                    <h3 class="text-3xl font-bold mt-2">{{ $attendancePercentage > 0 ? $attendancePercentage . '%' : 'N/A' }}</h3>
                     <p class="text-orange-100 text-xs mt-2">
-                        <i class="fas fa-arrow-up"></i> 2% higher than yesterday
+                        <i class="fas fa-clipboard-check"></i> {{ date('l, M d, Y') }}
                     </p>
                 </div>
                 <div class="bg-white/20 rounded-full p-4">
@@ -106,16 +106,17 @@
                 <!-- Chart Placeholder -->
                 <div class="h-64 flex items-center justify-center bg-gray-50 rounded-lg"
                      x-data="{
-                         days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                         attendance: [92, 95, 88, 94, 97, 85, 90]
+                         days: @json($last7Days),
+                         attendance: @json($attendanceData)
                      }">
                     <div class="w-full h-full p-4">
                         <div class="flex items-end justify-between h-full space-x-2">
                             <template x-for="(day, index) in days" :key="index">
                                 <div class="flex-1 flex flex-col items-center space-y-2">
-                                    <div class="w-full bg-primary-600 rounded-t hover:bg-primary-700 transition-colors cursor-pointer"
+                                    <div class="w-full bg-primary-600 rounded-t hover:bg-primary-700 transition-colors cursor-pointer relative group"
                                          :style="`height: ${attendance[index]}%`"
-                                         :data-tooltip="`${attendance[index]}%`">
+                                         :title="`${attendance[index]}%`">
+                                        <span class="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" x-text="`${attendance[index]}%`"></span>
                                     </div>
                                     <span class="text-xs text-gray-600" x-text="day"></span>
                                 </div>
@@ -189,57 +190,23 @@
             </div>
             <div class="card-body">
                 <div class="space-y-4">
+                    @forelse($recentActivities as $activity)
                     <!-- Activity Item -->
                     <div class="flex items-start space-x-3">
-                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-user-plus text-blue-600"></i>
+                        <div class="w-10 h-10 rounded-full bg-{{ $activity['color'] }}-100 flex items-center justify-center flex-shrink-0">
+                            <i class="fas {{ $activity['icon'] }} text-{{ $activity['color'] }}-600"></i>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm text-gray-900">
-                                <span class="font-medium">John Doe</span> was registered in Class 10-A
-                            </p>
-                            <p class="text-xs text-gray-500 mt-1">2 hours ago</p>
+                            <p class="text-sm text-gray-900">{!! $activity['title'] !!}</p>
+                            <p class="text-xs text-gray-500 mt-1">{{ $activity['time'] }}</p>
                         </div>
                     </div>
-
-                    <!-- Activity Item -->
-                    <div class="flex items-start space-x-3">
-                        <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-clipboard-check text-green-600"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm text-gray-900">
-                                Attendance marked for <span class="font-medium">Class 9-B</span>
-                            </p>
-                            <p class="text-xs text-gray-500 mt-1">4 hours ago</p>
-                        </div>
+                    @empty
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-inbox text-4xl mb-3"></i>
+                        <p>No recent activities</p>
                     </div>
-
-                    <!-- Activity Item -->
-                    <div class="flex items-start space-x-3">
-                        <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-file-alt text-purple-600"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm text-gray-900">
-                                <span class="font-medium">Math Exam</span> results uploaded for Class 11
-                            </p>
-                            <p class="text-xs text-gray-500 mt-1">6 hours ago</p>
-                        </div>
-                    </div>
-
-                    <!-- Activity Item -->
-                    <div class="flex items-start space-x-3">
-                        <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-chalkboard-teacher text-orange-600"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm text-gray-900">
-                                <span class="font-medium">Mrs. Sarah Wilson</span> joined as Science teacher
-                            </p>
-                            <p class="text-xs text-gray-500 mt-1">Yesterday</p>
-                        </div>
-                    </div>
+                    @endforelse
                 </div>
             </div>
         </div>
@@ -248,54 +215,54 @@
         <div class="card">
             <div class="card-header">
                 <h2 class="text-lg font-semibold text-gray-900">Upcoming Events</h2>
-                <a href="#" class="text-sm text-primary-600 hover:text-primary-700">View Calendar</a>
+                <a href="{{ route('calendar.index') }}" class="text-sm text-primary-600 hover:text-primary-700">View Calendar</a>
             </div>
             <div class="card-body">
                 <div class="space-y-4">
+                    @forelse($upcomingEvents as $event)
+                    @php
+                        $colorMap = [
+                            'holiday' => 'red',
+                            'examination' => 'green',
+                            'meeting' => 'blue',
+                            'sports' => 'orange',
+                            'cultural' => 'purple',
+                            'other' => 'gray'
+                        ];
+                        $color = $colorMap[$event->type] ?? 'blue';
+                        $startDate = \Carbon\Carbon::parse($event->start_date);
+                    @endphp
                     <!-- Event Item -->
-                    <div class="flex items-start space-x-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                    <div class="flex items-start space-x-4 p-3 bg-{{ $color }}-50 rounded-lg border border-{{ $color }}-200">
                         <div class="text-center flex-shrink-0">
-                            <div class="w-12 h-12 bg-blue-600 text-white rounded-lg flex flex-col items-center justify-center">
-                                <span class="text-xs font-medium">JAN</span>
-                                <span class="text-lg font-bold">25</span>
+                            <div class="w-12 h-12 bg-{{ $color }}-600 text-white rounded-lg flex flex-col items-center justify-center">
+                                <span class="text-xs font-medium">{{ $startDate->format('M') }}</span>
+                                <span class="text-lg font-bold">{{ $startDate->format('d') }}</span>
                             </div>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="font-medium text-gray-900">Parent-Teacher Meeting</p>
-                            <p class="text-sm text-gray-600 mt-1">9:00 AM - 3:00 PM</p>
-                            <span class="badge badge-primary mt-2">School Event</span>
+                            <p class="font-medium text-gray-900">{{ $event->title }}</p>
+                            <p class="text-sm text-gray-600 mt-1">
+                                @if($event->start_time)
+                                    {{ \Carbon\Carbon::parse($event->start_time)->format('g:i A') }}
+                                    @if($event->end_time)
+                                        - {{ \Carbon\Carbon::parse($event->end_time)->format('g:i A') }}
+                                    @endif
+                                @else
+                                    All Day
+                                @endif
+                            </p>
+                            <span class="badge badge-{{ $color === 'red' ? 'danger' : ($color === 'green' ? 'success' : ($color === 'orange' ? 'warning' : 'primary')) }} mt-2">
+                                {{ ucfirst($event->type) }}
+                            </span>
                         </div>
                     </div>
-
-                    <!-- Event Item -->
-                    <div class="flex items-start space-x-4 p-3 bg-green-50 rounded-lg border border-green-200">
-                        <div class="text-center flex-shrink-0">
-                            <div class="w-12 h-12 bg-green-600 text-white rounded-lg flex flex-col items-center justify-center">
-                                <span class="text-xs font-medium">JAN</span>
-                                <span class="text-lg font-bold">28</span>
-                            </div>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="font-medium text-gray-900">Mid-Term Examinations Begin</p>
-                            <p class="text-sm text-gray-600 mt-1">All Classes</p>
-                            <span class="badge badge-success mt-2">Examination</span>
-                        </div>
+                    @empty
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-calendar-alt text-4xl mb-3"></i>
+                        <p>No upcoming events</p>
                     </div>
-
-                    <!-- Event Item -->
-                    <div class="flex items-start space-x-4 p-3 bg-purple-50 rounded-lg border border-purple-200">
-                        <div class="text-center flex-shrink-0">
-                            <div class="w-12 h-12 bg-purple-600 text-white rounded-lg flex flex-col items-center justify-center">
-                                <span class="text-xs font-medium">FEB</span>
-                                <span class="text-lg font-bold">05</span>
-                            </div>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="font-medium text-gray-900">Science Fair</p>
-                            <p class="text-sm text-gray-600 mt-1">10:00 AM - 4:00 PM</p>
-                            <span class="badge badge-info mt-2">Competition</span>
-                        </div>
-                    </div>
+                    @endforelse
                 </div>
             </div>
         </div>
@@ -326,75 +293,49 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @forelse($classPerformance as $class)
                         <tr>
-                            <td class="font-medium">Class 10-A</td>
-                            <td>42</td>
+                            <td class="font-medium">{{ $class['name'] }}</td>
+                            <td>{{ $class['student_count'] }}</td>
                             <td>
                                 <div class="flex items-center">
-                                    <span class="font-medium text-green-600">85.5%</span>
+                                    <span class="font-medium text-{{ $class['avg_grade'] >= 80 ? 'green' : ($class['avg_grade'] >= 70 ? 'blue' : 'yellow') }}-600">
+                                        {{ $class['avg_grade'] > 0 ? $class['avg_grade'] . '%' : 'N/A' }}
+                                    </span>
+                                    @if($class['avg_grade'] > 0)
                                     <div class="ml-2 flex-1 progress">
-                                        <div class="progress-bar bg-green-600" style="width: 85.5%"></div>
+                                        <div class="progress-bar bg-{{ $class['avg_grade'] >= 80 ? 'green' : ($class['avg_grade'] >= 70 ? 'blue' : 'yellow') }}-600"
+                                             style="width: {{ $class['avg_grade'] }}%"></div>
                                     </div>
+                                    @endif
                                 </div>
                             </td>
                             <td>
-                                <span class="badge badge-success">94.2%</span>
+                                @if($class['attendance_rate'] > 0)
+                                    <span class="badge badge-{{ $class['attendance_rate'] >= 90 ? 'success' : ($class['attendance_rate'] >= 80 ? 'primary' : 'warning') }}">
+                                        {{ $class['attendance_rate'] }}%
+                                    </span>
+                                @else
+                                    <span class="badge badge-secondary">N/A</span>
+                                @endif
                             </td>
                             <td>
-                                <span class="badge badge-success">Excellent</span>
+                                <span class="badge badge-{{ $class['status_badge'] }}">{{ $class['status'] }}</span>
                             </td>
                             <td>
-                                <button class="text-primary-600 hover:text-primary-700 text-sm font-medium">
+                                <a href="{{ route('classes.show', $class['id']) }}" class="text-primary-600 hover:text-primary-700 text-sm font-medium">
                                     View Details
-                                </button>
+                                </a>
                             </td>
                         </tr>
+                        @empty
                         <tr>
-                            <td class="font-medium">Class 10-B</td>
-                            <td>38</td>
-                            <td>
-                                <div class="flex items-center">
-                                    <span class="font-medium text-blue-600">78.3%</span>
-                                    <div class="ml-2 flex-1 progress">
-                                        <div class="progress-bar" style="width: 78.3%"></div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <span class="badge badge-success">91.5%</span>
-                            </td>
-                            <td>
-                                <span class="badge badge-primary">Good</span>
-                            </td>
-                            <td>
-                                <button class="text-primary-600 hover:text-primary-700 text-sm font-medium">
-                                    View Details
-                                </button>
+                            <td colspan="6" class="text-center py-8 text-gray-500">
+                                <i class="fas fa-school text-4xl mb-3"></i>
+                                <p>No classes available</p>
                             </td>
                         </tr>
-                        <tr>
-                            <td class="font-medium">Class 11-A</td>
-                            <td>35</td>
-                            <td>
-                                <div class="flex items-center">
-                                    <span class="font-medium text-yellow-600">72.8%</span>
-                                    <div class="ml-2 flex-1 progress">
-                                        <div class="progress-bar bg-yellow-600" style="width: 72.8%"></div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <span class="badge badge-warning">88.3%</span>
-                            </td>
-                            <td>
-                                <span class="badge badge-warning">Average</span>
-                            </td>
-                            <td>
-                                <button class="text-primary-600 hover:text-primary-700 text-sm font-medium">
-                                    View Details
-                                </button>
-                            </td>
-                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
